@@ -198,7 +198,7 @@ class _ElementWidgetState extends State<ElementWidget> {
 
     return Transform.translate(
       offset: widget.element.position,
-      child: SizedBox(
+      child: Container(
         width: widget.element.size.width + widget.element.handlerSize,
         height: widget.element.size.height + widget.element.handlerSize,
         child: Stack(
@@ -227,9 +227,13 @@ class _ElementWidgetState extends State<ElementWidget> {
       child: const Align(
         alignment: Alignment.bottomRight,
         child: HandlerWidget(
-          width: 30,
-          height: 30,
-          icon: Icon(Icons.compare_arrows),
+          width: 20,
+          height: 20,
+          isBorder: false,
+          icon: Icon(
+            Icons.compare_arrows,
+            color: Color(0xff0B2D46),
+          ),
         ),
       ),
     );
@@ -241,11 +245,15 @@ class _ElementWidgetState extends State<ElementWidget> {
         widget.dashboard.removeElement(widget.element);
       },
       child: const Align(
-        alignment: Alignment.bottomLeft,
+        alignment: Alignment.topRight,
         child: HandlerWidget(
-          width: 30,
-          height: 30,
-          icon: Icon(Icons.delete_outline),
+          width: 25,
+          height: 25,
+          isBorder: false,
+          icon: Icon(
+            Icons.remove_circle_rounded,
+            color: Color(0xff0B2D46),
+          ),
         ),
       ),
     );
