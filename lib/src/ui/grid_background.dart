@@ -5,10 +5,10 @@ class GridBackgroundParams extends ChangeNotifier {
   /// [gridSquare] is the raw size of the grid square when scale is 1
   GridBackgroundParams({
     double gridSquare = 20.0,
-    this.gridThickness = 0.7,
-    this.secondarySquareStep = 5,
+    this.gridThickness = 0,
+    this.secondarySquareStep = 0,
     this.backgroundColor = Colors.white,
-    this.gridColor = Colors.black12,
+    this.gridColor = Colors.white,
     void Function(double scale)? onScaleUpdate,
   }) : rawGridSquareSize = gridSquare {
     if (onScaleUpdate != null) {
@@ -177,11 +177,10 @@ class _GridBackgroundPainter extends CustomPainter {
     for (var x = startX - extraLines * params.gridSquare;
         x < size.width + extraLines * params.gridSquare;
         x += params.gridSquare) {
-      paint.strokeWidth = ((x - startX) / params.gridSquare).round() %
-                  params.secondarySquareStep ==
-              0
-          ? params.gridThickness * 2.0
-          : params.gridThickness;
+      paint.strokeWidth =
+          ((x - startX) / params.gridSquare).round() % params.secondarySquareStep == 0
+              ? params.gridThickness * 2.0
+              : params.gridThickness;
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
     }
 
@@ -189,11 +188,10 @@ class _GridBackgroundPainter extends CustomPainter {
     for (var y = startY - extraLines * params.gridSquare;
         y < size.height + extraLines * params.gridSquare;
         y += params.gridSquare) {
-      paint.strokeWidth = ((y - startY) / params.gridSquare).round() %
-                  params.secondarySquareStep ==
-              0
-          ? params.gridThickness * 2.0
-          : params.gridThickness;
+      paint.strokeWidth =
+          ((y - startY) / params.gridSquare).round() % params.secondarySquareStep == 0
+              ? params.gridThickness * 2.0
+              : params.gridThickness;
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
   }
