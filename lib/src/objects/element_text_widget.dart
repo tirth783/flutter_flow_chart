@@ -32,26 +32,41 @@ class _ElementTextWidgetState extends State<ElementTextWidget> {
     final textStyle = TextStyle(
       color: widget.element.textColor,
       fontSize: widget.element.textSize,
-      fontWeight:
-          widget.element.textIsBold ? FontWeight.bold : FontWeight.normal,
+      fontWeight: widget.element.textIsBold ? FontWeight.bold : FontWeight.normal,
       fontFamily: widget.element.fontFamily,
     );
 
-    return Align(
-      child: widget.element.isEditingText
-          ? TextFormField(
-              controller: _controller,
-              autofocus: true,
-              onTapOutside: (event) => dismissTextEditor(),
-              onFieldSubmitted: dismissTextEditor,
-              textAlign: TextAlign.center,
-              style: textStyle,
-            )
-          : Text(
-              widget.element.text,
-              textAlign: TextAlign.center,
-              style: textStyle,
-            ),
+    final subTextStyle = TextStyle(
+      color: widget.element.subTextColor,
+      fontSize: widget.element.subTextSize,
+      fontFamily: widget.element.fontFamily,
+    );
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Align(
+          child: widget.element.isEditingText
+              ? TextFormField(
+                  controller: _controller,
+                  autofocus: true,
+                  onTapOutside: (event) => dismissTextEditor(),
+                  onFieldSubmitted: dismissTextEditor,
+                  textAlign: TextAlign.center,
+                  style: textStyle,
+                )
+              : Text(
+                  widget.element.text,
+                  textAlign: TextAlign.center,
+                  style: textStyle,
+                ),
+        ),
+        Text(
+          widget.element.subText,
+          textAlign: TextAlign.center,
+          style: subTextStyle,
+        )
+      ],
     );
   }
 

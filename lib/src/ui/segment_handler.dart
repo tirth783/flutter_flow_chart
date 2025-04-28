@@ -24,8 +24,7 @@ class SegmentHandler extends StatefulWidget {
   final void Function(BuildContext context, Pivot position)? onPivotPressed;
 
   ///
-  final void Function(BuildContext context, Pivot position)?
-      onPivotSecondaryPressed;
+  final void Function(BuildContext context, Pivot position)? onPivotSecondaryPressed;
 
   @override
   State<SegmentHandler> createState() => _SegmentHandlerState();
@@ -51,8 +50,7 @@ class _SegmentHandlerState extends State<SegmentHandler> {
   @override
   Widget build(BuildContext context) {
     return Transform.translate(
-      offset:
-          widget.pivot.pivot - const Offset(5, 5) * widget.dashboard.zoomFactor,
+      offset: widget.pivot.pivot - const Offset(5, 5) * widget.dashboard.zoomFactor,
       child: Listener(
         onPointerDown: (evt) {
           delta = evt.delta;
@@ -60,8 +58,7 @@ class _SegmentHandlerState extends State<SegmentHandler> {
         child: Draggable(
           feedback: const SizedBox(),
           onDragUpdate: (details) {
-            widget.pivot.pivot =
-                details.globalPosition - widget.dashboard.position - delta;
+            widget.pivot.pivot = details.globalPosition - widget.dashboard.position - delta;
           },
           onDragEnd: (details) {
             widget.pivot.pivot = details.offset - widget.dashboard.position;

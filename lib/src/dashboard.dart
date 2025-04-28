@@ -70,10 +70,8 @@ class Dashboard extends ChangeNotifier {
       );
     }
     d
-      ..blockDefaultZoomGestures =
-          (map['blockDefaultZoomGestures'] as bool? ?? false)
-      ..minimumZoomFactor =
-          ((map['minimumZoomFactor'] ?? 0.25) as num).toDouble();
+      ..blockDefaultZoomGestures = (map['blockDefaultZoomGestures'] as bool? ?? false)
+      ..minimumZoomFactor = ((map['minimumZoomFactor'] ?? 0.25) as num).toDouble();
 
     return d;
   }
@@ -131,8 +129,7 @@ class Dashboard extends ChangeNotifier {
 
   /// set the feedback offset to help on mobile device to see the
   /// end of arrow and not hiding behind the finger when moving it
-  void setHandlerFeedbackOffset(Offset offset) =>
-      handlerFeedbackOffset = offset;
+  void setHandlerFeedbackOffset(Offset offset) => handlerFeedbackOffset = offset;
 
   /// set [draggable] element property
   void setElementDraggable(
@@ -267,8 +264,7 @@ class Dashboard extends ChangeNotifier {
     FlowElement destElement,
   ) {
     try {
-      return srcElement.next
-          .firstWhere((element) => element.destElementId == destElement.id);
+      return srcElement.next.firstWhere((element) => element.destElementId == destElement.id);
     } catch (e) {
       return null;
     }
@@ -321,8 +317,7 @@ class Dashboard extends ChangeNotifier {
 
     if (isSrc) {
       element.next.removeWhere(
-        (handlerParam) =>
-            handlerParam.arrowParams.startArrowPosition == alignment,
+        (handlerParam) => handlerParam.arrowParams.startArrowPosition == alignment,
       );
     } else {
       final src = findSrcElementByDestElement(element);
@@ -365,16 +360,13 @@ class Dashboard extends ChangeNotifier {
       try {
         // assuming element is the src
         conn = element.next.firstWhere(
-          (handlerParam) =>
-              handlerParam.arrowParams.startArrowPosition == alignment,
+          (handlerParam) => handlerParam.arrowParams.startArrowPosition == alignment,
         );
         if (conn.arrowParams.style != ArrowStyle.segmented) return;
 
         final dest = findElementById(conn.destElementId);
-        newPoint = (dest!
-                    .getHandlerPosition(conn.arrowParams.endArrowPosition) +
-                element
-                    .getHandlerPosition(conn.arrowParams.startArrowPosition)) /
+        newPoint = (dest!.getHandlerPosition(conn.arrowParams.endArrowPosition) +
+                element.getHandlerPosition(conn.arrowParams.startArrowPosition)) /
             2;
       } catch (e) {
         // apparently is not
@@ -384,8 +376,7 @@ class Dashboard extends ChangeNotifier {
         );
         if (conn.arrowParams.style != ArrowStyle.segmented) return;
 
-        newPoint = (element
-                    .getHandlerPosition(conn.arrowParams.endArrowPosition) +
+        newPoint = (element.getHandlerPosition(conn.arrowParams.endArrowPosition) +
                 src.getHandlerPosition(conn.arrowParams.startArrowPosition)) /
             2;
       }
@@ -486,10 +477,8 @@ class Dashboard extends ChangeNotifier {
     for (final element in elements) {
       // applying new zoom
       element
-        ..position = (element.position - focalPoint) /
-                gridBackgroundParams.scale *
-                factor +
-            focalPoint
+        ..position =
+            (element.position - focalPoint) / gridBackgroundParams.scale * factor + focalPoint
         ..setScale(gridBackgroundParams.scale, factor);
       for (final conn in element.next) {
         for (final pivot in conn.pivots) {
@@ -532,8 +521,7 @@ class Dashboard extends ChangeNotifier {
     for (var i = 0; i < elements.length; i++) {
       if (elements[i].id == destId) {
         // if the [id] already exist, remove it and add this new connection
-        sourceElement.next
-            .removeWhere((element) => element.destElementId == destId);
+        sourceElement.next.removeWhere((element) => element.destElementId == destId);
         final conn = ConnectionParams(
           destElementId: elements[i].id,
           arrowParams: arrowParams,

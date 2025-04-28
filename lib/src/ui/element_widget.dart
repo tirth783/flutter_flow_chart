@@ -7,7 +7,6 @@ import 'package:flutter_flow_chart/src/objects/oval_widget.dart';
 import 'package:flutter_flow_chart/src/objects/parallelogram_widget.dart';
 import 'package:flutter_flow_chart/src/objects/rectangle_widget.dart';
 import 'package:flutter_flow_chart/src/objects/storage_widget.dart';
-
 import 'package:flutter_flow_chart/src/ui/element_handlers.dart';
 import 'package:flutter_flow_chart/src/ui/handler_widget.dart';
 
@@ -38,16 +37,13 @@ class ElementWidget extends StatefulWidget {
   final void Function(BuildContext context, Offset position)? onElementPressed;
 
   ///
-  final void Function(BuildContext context, Offset position)?
-      onElementSecondaryTapped;
+  final void Function(BuildContext context, Offset position)? onElementSecondaryTapped;
 
   ///
-  final void Function(BuildContext context, Offset position)?
-      onElementLongPressed;
+  final void Function(BuildContext context, Offset position)? onElementLongPressed;
 
   ///
-  final void Function(BuildContext context, Offset position)?
-      onElementSecondaryLongTapped;
+  final void Function(BuildContext context, Offset position)? onElementSecondaryLongTapped;
 
   ///
   final void Function(
@@ -127,6 +123,34 @@ class _ElementWidgetState extends State<ElementWidget> {
         element = ImageWidget(element: widget.element);
     }
 
+    // switch (widget.element.kind) {
+    //   case ElementKind.diamond:
+    //     element = DiamondWidget(element: widget.element);
+    //   case ElementKind.storage:
+    //     element = StorageWidget(element: widget.element);
+    //   case ElementKind.oval:
+    //     element = OvalWidget(element: widget.element);
+    //   case ElementKind.parallelogram:
+    //     element = ParallelogramWidget(element: widget.element);
+    //   case ElementKind.hexagon:
+    //     element = HexagonWidget(element: widget.element);
+    //   case ElementKind.rectangle:
+    //     element = RectangleWidget(element: widget.element);
+    //   case ElementKind.image:
+    //     element = Stack(
+    //       alignment: Alignment.center, // Add this to center the image
+    //       children: [
+    //         // Add rectangle as background
+    //         RectangleWidget(element: widget.element),
+    //         // Add image on top with proper sizing
+    //         Padding(
+    //           padding: const EdgeInsets.all(8.0), // Add padding to keep image inside rectangle
+    //           child: ImageWidget(element: widget.element),
+    //         ),
+    //       ],
+    //     );
+    // }
+
     if (widget.element.isConnectable && widget.element.handlers.isNotEmpty) {
       element = ElementHandlers(
         dashboard: widget.dashboard,
@@ -156,8 +180,7 @@ class _ElementWidgetState extends State<ElementWidget> {
     var secondaryTapDownPos = Offset.zero;
     element = GestureDetector(
       onTapDown: (details) => tapLocation = details.globalPosition,
-      onSecondaryTapDown: (details) =>
-          secondaryTapDownPos = details.globalPosition,
+      onSecondaryTapDown: (details) => secondaryTapDownPos = details.globalPosition,
       onTap: () {
         widget.onElementPressed?.call(context, tapLocation);
       },
@@ -247,8 +270,7 @@ class _ElementWidgetState extends State<ElementWidget> {
           );
         },
         onDragEnd: (details) {
-          widget.element
-              .changePosition(details.offset - widget.dashboard.position);
+          widget.element.changePosition(details.offset - widget.dashboard.position);
         },
       ),
     );

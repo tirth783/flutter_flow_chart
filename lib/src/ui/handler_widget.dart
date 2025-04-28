@@ -8,7 +8,7 @@ class HandlerWidget extends StatelessWidget {
     required this.height,
     super.key,
     this.backgroundColor = Colors.white,
-    this.borderColor = Colors.blue,
+    this.borderColor = Colors.black,
     this.icon,
   });
 

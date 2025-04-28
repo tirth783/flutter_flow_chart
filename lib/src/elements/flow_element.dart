@@ -69,9 +69,12 @@ class FlowElement extends ChangeNotifier {
     Offset position = Offset.zero,
     this.size = Size.zero,
     this.text = '',
+    this.subText = '',
     this.textColor = Colors.black,
+    this.subTextColor = Colors.grey,
     this.fontFamily,
     this.textSize = 24,
+    this.subTextSize = 12,
     this.textIsBold = false,
     this.kind = ElementKind.rectangle,
     this.handlers = const [
@@ -109,9 +112,12 @@ class FlowElement extends ChangeNotifier {
         (map['size.height'] as num).toDouble(),
       ),
       text: map['text'] as String,
+      subText: map['subText'] as String,
       textColor: Color(map['textColor'] as int),
+      subTextColor: Color(map['subTextColor'] as int),
       fontFamily: map['fontFamily'] as String?,
       textSize: (map['textSize'] as num).toDouble(),
+      subTextSize: (map['subTextSize'] as num).toDouble(),
       textIsBold: map['textIsBold'] as bool,
       kind: ElementKind.values[map['kind'] as int],
       handlers: List<Handler>.from(
@@ -161,14 +167,23 @@ class FlowElement extends ChangeNotifier {
   /// Element text
   String text;
 
+  /// Element subText
+  String subText;
+
   /// Text color
   Color textColor;
+
+  /// subTextColor color
+  Color subTextColor;
 
   /// Text font family
   String? fontFamily;
 
   /// Text size
   double textSize;
+
+  /// subTextSize
+  double subTextSize;
 
   /// Makes text bold if true
   bool textIsBold;
@@ -220,7 +235,7 @@ class FlowElement extends ChangeNotifier {
 
   @override
   String toString() {
-    return 'FlowElement{kind: $kind, text: $text}';
+    return 'FlowElement{kind: $kind, text: $text, subText: $subText}';
   }
 
   /// Get the handler center of this handler for the given alignment.
@@ -238,6 +253,7 @@ class FlowElement extends ChangeNotifier {
     size = size / currentZoom * factor;
     handlerSize = handlerSize / currentZoom * factor;
     textSize = textSize / currentZoom * factor;
+    subTextSize = subTextSize / currentZoom * factor;
     for (final element in next) {
       element.arrowParams.setScale(currentZoom, factor);
     }
@@ -254,9 +270,21 @@ class FlowElement extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Set subText
+  void setsubText(String subText) {
+    this.subText = subText;
+    notifyListeners();
+  }
+
   /// Set text color
   void setTextColor(Color color) {
     textColor = color;
+    notifyListeners();
+  }
+
+  /// Set subTextColor color
+  void setSubTextColor(Color color) {
+    subTextColor = color;
     notifyListeners();
   }
 
@@ -269,6 +297,12 @@ class FlowElement extends ChangeNotifier {
   /// Set text size
   void setTextSize(double size) {
     textSize = size;
+    notifyListeners();
+  }
+
+  /// subTextSize
+  void setSubTextSize(double size) {
+    subTextSize = size;
     notifyListeners();
   }
 
@@ -328,9 +362,12 @@ class FlowElement extends ChangeNotifier {
     return position.hashCode ^
         size.hashCode ^
         text.hashCode ^
+        subText.hashCode ^
         textColor.hashCode ^
+        subTextColor.hashCode ^
         fontFamily.hashCode ^
         textSize.hashCode ^
+        subTextSize.hashCode ^
         textIsBold.hashCode ^
         id.hashCode ^
         kind.hashCode ^
@@ -354,9 +391,12 @@ class FlowElement extends ChangeNotifier {
       'size.width': size.width,
       'size.height': size.height,
       'text': text,
+      'subText': subText,
       'textColor': textColor.value,
+      'subTextColor': subTextColor.value,
       'fontFamily': fontFamily,
       'textSize': textSize,
+      'subTextSize': subTextSize,
       'textIsBold': textIsBold,
       'id': id,
       'kind': kind.index,

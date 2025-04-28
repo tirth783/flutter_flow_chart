@@ -24,14 +24,14 @@ class RectangleWidget extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               color: element.backgroundColor,
-              boxShadow: [
-                if (element.elevation > 0.01)
-                  BoxShadow(
-                    color: Colors.grey,
-                    offset: Offset(element.elevation, element.elevation),
-                    blurRadius: element.elevation * 1.3,
-                  ),
-              ],
+              // boxShadow: [
+              //   if (element.elevation > 0.01)
+              //     BoxShadow(
+              //       color: Colors.grey,
+              //       offset: Offset(element.elevation, element.elevation),
+              //       blurRadius: element.elevation * 1.3,
+              //     ),
+              // ],
               border: Border.all(
                 color: element.borderColor,
                 width: element.borderThickness,
