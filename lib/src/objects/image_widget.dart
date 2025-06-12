@@ -16,9 +16,8 @@ class ImageWidget extends StatefulWidget {
           element.data is ImageProvider || (element.serializedData?.isNotEmpty ?? false),
           'Missing image ("data" parameter should be an ImageProvider)',
         ),
-        imageProvider = element.serializedData?.isNotEmpty ?? false
-            ? Image.memory(base64Decode(element.serializedData!)).image
-            : element.data as ImageProvider;
+        imageProvider =
+            element.serializedData?.isNotEmpty ?? false ? Image.memory(base64Decode(element.serializedData!)).image : element.data as ImageProvider;
 
   ///
   final FlowElement element;
@@ -121,17 +120,14 @@ class _ImageWidgetState extends State<ImageWidget> {
                   child: ClipOval(
                     child: Image(
                       image: widget.imageProvider,
-                      width: diameter,
-                      height: diameter,
+                      width: 80,
+                      height: 80,
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
               ),
-
-              // Text beneath
               Expanded(
-                flex: 1,
                 child: Center(
                   child: ElementTextWidget(element: widget.element),
                 ),
