@@ -5,10 +5,12 @@ class GridBackgroundParams extends ChangeNotifier {
   /// [gridSquare] is the raw size of the grid square when scale is 1
   GridBackgroundParams({
     double gridSquare = 20.0,
-    this.gridThickness = 0,
-    this.secondarySquareStep = 0,
-    this.backgroundColor = Colors.white,
-    this.gridColor = Colors.white,
+    this.gridThickness = 0.7,
+    this.secondarySquareStep = 5,
+    // this.backgroundColor = Colors.white,
+    // this.gridColor = Colors.white,
+    this.backgroundColor = Colors.transparent,
+    this.gridColor = Colors.transparent,
     void Function(double scale)? onScaleUpdate,
   }) : rawGridSquareSize = gridSquare {
     if (onScaleUpdate != null) {
@@ -19,16 +21,18 @@ class GridBackgroundParams extends ChangeNotifier {
   ///
   factory GridBackgroundParams.fromMap(Map<String, dynamic> map) {
     final params = GridBackgroundParams(
-      gridSquare: ((map['gridSquare'] ?? 20.0) as num).toDouble(),
-      gridThickness: ((map['gridThickness'] ?? 0.7) as num).toDouble(),
+      gridSquare: map['gridSquare'] as double? ?? 20.0,
+      gridThickness: map['gridThickness'] as double? ?? 0.7,
       secondarySquareStep: map['secondarySquareStep'] as int? ?? 5,
-      backgroundColor: Color(map['backgroundColor'] as int? ?? 0xFFFFFFFF),
-      gridColor: Color(map['gridColor'] as int? ?? 0xFFFFFFFF),
+      // backgroundColor: Color(map['backgroundColor'] as int? ?? 0xFFFFFFFF),
+      // gridColor: Color(map['gridColor'] as int? ?? 0xFFFFFFFF),
+      backgroundColor: Color(0x00FFFFFF),
+      gridColor: Color(0x00FFFFFF),
     )
-      ..scale = ((map['scale'] ?? 1.0) as num).toDouble()
+      ..scale = map['scale'] as double? ?? 1.0
       .._offset = Offset(
-        ((map['offset.dx'] ?? 0.0) as num).toDouble(),
-        ((map['offset.dy'] ?? 0.0) as num).toDouble(),
+        map['offset.dx'] as double? ?? 0.0,
+        map['offset.dy'] as double? ?? 0.0,
       );
 
     return params;
@@ -155,7 +159,8 @@ class _GridBackgroundPainter extends CustomPainter {
     final paint = Paint()
 
       // Background
-      ..color = params.backgroundColor;
+      // ..color = params.backgroundColor;
+      ..color = const Color(0x00FFFFFF);
     canvas.drawRect(
       Rect.fromPoints(Offset.zero, Offset(size.width, size.height)),
       paint,
@@ -163,7 +168,7 @@ class _GridBackgroundPainter extends CustomPainter {
 
     // grid
     paint
-      ..color = params.gridColor
+      ..color = const Color(0x00FFFFFF)
       ..style = PaintingStyle.stroke;
 
     // Calculate the starting points for x and y
@@ -174,24 +179,16 @@ class _GridBackgroundPainter extends CustomPainter {
     const extraLines = 2;
 
     // Draw vertical lines
-    for (var x = startX - extraLines * params.gridSquare;
-        x < size.width + extraLines * params.gridSquare;
-        x += params.gridSquare) {
+    for (var x = startX - extraLines * params.gridSquare; x < size.width + extraLines * params.gridSquare; x += params.gridSquare) {
       paint.strokeWidth =
-          ((x - startX) / params.gridSquare).round() % params.secondarySquareStep == 0
-              ? params.gridThickness * 2.0
-              : params.gridThickness;
+          ((x - startX) / params.gridSquare).round() % params.secondarySquareStep == 0 ? params.gridThickness * 2.0 : params.gridThickness;
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
     }
 
     // Draw horizontal lines
-    for (var y = startY - extraLines * params.gridSquare;
-        y < size.height + extraLines * params.gridSquare;
-        y += params.gridSquare) {
+    for (var y = startY - extraLines * params.gridSquare; y < size.height + extraLines * params.gridSquare; y += params.gridSquare) {
       paint.strokeWidth =
-          ((y - startY) / params.gridSquare).round() % params.secondarySquareStep == 0
-              ? params.gridThickness * 2.0
-              : params.gridThickness;
+          ((y - startY) / params.gridSquare).round() % params.secondarySquareStep == 0 ? params.gridThickness * 2.0 : params.gridThickness;
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
   }
