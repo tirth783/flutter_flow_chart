@@ -5,12 +5,17 @@ class GridBackgroundParams extends ChangeNotifier {
   /// [gridSquare] is the raw size of the grid square when scale is 1
   GridBackgroundParams({
     double gridSquare = 20.0,
-    this.gridThickness = 0.7,
-    this.secondarySquareStep = 5,
+    // this.gridThickness = 0.7,
+    // this.secondarySquareStep = 5,
     // this.backgroundColor = Colors.white,
     // this.gridColor = Colors.white,
-    this.backgroundColor = Colors.transparent,
-    this.gridColor = Colors.transparent,
+    this.gridColor = Colors.black12,
+    this.gridThickness = 0.7,
+    this.secondarySquareStep = 5,
+    this.gridColor = Colors.white,
+    this.backgroundColor = Colors.white,
+    // this.backgroundColor = Colors.transparent,
+    // this.gridColor = Colors.transparent,
     void Function(double scale)? onScaleUpdate,
   }) : rawGridSquareSize = gridSquare {
     if (onScaleUpdate != null) {
