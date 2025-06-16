@@ -5,17 +5,10 @@ class GridBackgroundParams extends ChangeNotifier {
   /// [gridSquare] is the raw size of the grid square when scale is 1
   GridBackgroundParams({
     double gridSquare = 20.0,
-    // this.gridThickness = 0.7,
-    // this.secondarySquareStep = 5,
-    // this.backgroundColor = Colors.white,
-    // this.gridColor = Colors.white,
-    this.gridColor = Colors.black12,
     this.gridThickness = 0.7,
     this.secondarySquareStep = 5,
-    this.gridColor = Colors.white,
     this.backgroundColor = Colors.white,
-    // this.backgroundColor = Colors.transparent,
-    // this.gridColor = Colors.transparent,
+    this.gridColor = Colors.black12,
     void Function(double scale)? onScaleUpdate,
   }) : rawGridSquareSize = gridSquare {
     if (onScaleUpdate != null) {
@@ -26,18 +19,16 @@ class GridBackgroundParams extends ChangeNotifier {
   ///
   factory GridBackgroundParams.fromMap(Map<String, dynamic> map) {
     final params = GridBackgroundParams(
-      gridSquare: map['gridSquare'] as double? ?? 20.0,
-      gridThickness: map['gridThickness'] as double? ?? 0.7,
+      gridSquare: ((map['gridSquare'] ?? 20.0) as num).toDouble(),
+      gridThickness: ((map['gridThickness'] ?? 0.7) as num).toDouble(),
       secondarySquareStep: map['secondarySquareStep'] as int? ?? 5,
-      // backgroundColor: Color(map['backgroundColor'] as int? ?? 0xFFFFFFFF),
-      // gridColor: Color(map['gridColor'] as int? ?? 0xFFFFFFFF),
-      backgroundColor: Color(0x00FFFFFF),
-      gridColor: Color(0x00FFFFFF),
+      backgroundColor: Color(map['backgroundColor'] as int? ?? 0xFFFFFFFF),
+      gridColor: Color(map['gridColor'] as int? ?? 0xFFFFFFFF),
     )
-      ..scale = map['scale'] as double? ?? 1.0
+      ..scale = ((map['scale'] ?? 1.0) as num).toDouble()
       .._offset = Offset(
-        map['offset.dx'] as double? ?? 0.0,
-        map['offset.dy'] as double? ?? 0.0,
+        ((map['offset.dx'] ?? 0.0) as num).toDouble(),
+        ((map['offset.dy'] ?? 0.0) as num).toDouble(),
       );
 
     return params;
@@ -164,8 +155,7 @@ class _GridBackgroundPainter extends CustomPainter {
     final paint = Paint()
 
       // Background
-      // ..color = params.backgroundColor;
-      ..color = const Color(0x00FFFFFF);
+      ..color = params.backgroundColor;
     canvas.drawRect(
       Rect.fromPoints(Offset.zero, Offset(size.width, size.height)),
       paint,
@@ -173,7 +163,7 @@ class _GridBackgroundPainter extends CustomPainter {
 
     // grid
     paint
-      ..color = const Color(0x00FFFFFF)
+      ..color = params.gridColor
       ..style = PaintingStyle.stroke;
 
     // Calculate the starting points for x and y
@@ -181,7 +171,7 @@ class _GridBackgroundPainter extends CustomPainter {
     final startY = dy % (params.gridSquare * params.secondarySquareStep);
 
     // Calculate the number of lines to draw outside the visible area
-    const extraLines = 2;
+    const extraLines = 1;
 
     // Draw vertical lines
     for (var x = startX - extraLines * params.gridSquare; x < size.width + extraLines * params.gridSquare; x += params.gridSquare) {

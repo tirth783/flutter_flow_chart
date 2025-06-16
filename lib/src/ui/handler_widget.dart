@@ -10,7 +10,6 @@ class HandlerWidget extends StatelessWidget {
     this.backgroundColor = Colors.white,
     this.borderColor = Colors.black,
     this.icon,
-    this.isBorder = true,
   });
 
   ///
@@ -25,8 +24,6 @@ class HandlerWidget extends StatelessWidget {
   ///
   final Color borderColor;
 
-  final bool isBorder;
-
   ///
   final Widget? icon;
 
@@ -37,13 +34,13 @@ class HandlerWidget extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(50),
-        border: isBorder
-            ? Border.all(
-                width: 2,
-                color: const Color(0xFFC3C6D5),
-              )
-            : null,
+        borderRadius: BorderRadius.all(
+          Radius.circular(width),
+        ),
+        border: Border.all(
+          width: 1,
+          color: borderColor,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(4),

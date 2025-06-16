@@ -198,7 +198,7 @@ class _ElementWidgetState extends State<ElementWidget> {
 
     return Transform.translate(
       offset: widget.element.position,
-      child: Container(
+      child: SizedBox(
         width: widget.element.size.width + widget.element.handlerSize,
         height: widget.element.size.height + widget.element.handlerSize,
         child: Stack(
@@ -229,11 +229,7 @@ class _ElementWidgetState extends State<ElementWidget> {
         child: HandlerWidget(
           width: 20,
           height: 20,
-          isBorder: false,
-          icon: Icon(
-            Icons.compare_arrows,
-            color: Color(0xff0B2D46),
-          ),
+          icon: Icon(Icons.compare_arrows),
         ),
       ),
     );
@@ -249,11 +245,7 @@ class _ElementWidgetState extends State<ElementWidget> {
         child: HandlerWidget(
           width: 25,
           height: 25,
-          isBorder: false,
-          icon: Icon(
-            Icons.remove_circle_rounded,
-            color: Color(0xff0B2D46),
-          ),
+          icon: Icon(Icons.remove_circle_rounded),
         ),
       ),
     );
