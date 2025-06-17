@@ -89,6 +89,7 @@ class FlowElement extends ChangeNotifier {
     this.borderThickness = 3,
     this.elevation = 4,
     this.data,
+    this.serializedData,
     this.isDraggable = true,
     this.isResizable = false,
     this.isConnectable = true,
@@ -354,7 +355,9 @@ class FlowElement extends ChangeNotifier {
   bool operator ==(covariant FlowElement other) {
     if (identical(this, other)) return true;
 
-    return other.id == id;
+    return other.id == id &&
+        other.serializedData == serializedData &&
+        other.data == data;
   }
 
   @override
@@ -380,7 +383,9 @@ class FlowElement extends ChangeNotifier {
         next.hashCode ^
         isResizable.hashCode ^
         isConnectable.hashCode ^
-        isDeletable.hashCode;
+        isDeletable.hashCode ^
+        data.hashCode ^
+        serializedData.hashCode;
   }
 
   ///
@@ -417,4 +422,10 @@ class FlowElement extends ChangeNotifier {
 
   ///
   String toJson() => json.encode(toMap());
+
+  /// Set serialized data
+  void setSerializedData(String? data) {
+    serializedData = data;
+    notifyListeners();
+  }
 }
