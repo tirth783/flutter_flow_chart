@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
+import 'dart:io' show File;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_chart/src/elements/flow_element.dart';
@@ -13,7 +14,8 @@ class ImageWidget extends StatefulWidget {
     required this.element,
     super.key,
   })  : assert(
-          element.data is ImageProvider || (element.serializedData?.isNotEmpty ?? false),
+          element.data is ImageProvider ||
+              (element.serializedData?.isNotEmpty ?? false),
           'Missing image ("data" parameter should be an ImageProvider)',
         ),
         imageProvider = element.serializedData?.isNotEmpty ?? false
@@ -37,50 +39,7 @@ class _ImageWidgetState extends State<ImageWidget> {
   @override
   void initState() {
     super.initState();
-    // WidgetsBinding.instance.addPostFrameCallback((_) => _loadImage());
   }
-
-  // void _loadImage() {
-  //   // Only load if image is not already loaded
-  //   if (_cachedImage != null) return;
-  //
-  //   // Ensure we have a size size
-  //   final adaptSizeToImage = widget.element.size == Size.zero;
-  //   if (adaptSizeToImage) {
-  //     widget.element.changeSize(const Size(200, 150));
-  //   }
-  //   // Load image
-  //   widget.imageProvider.resolve(ImageConfiguration.empty).addListener(
-  //     ImageStreamListener(
-  //           (ImageInfo info, _) async {
-  //         debugPrint('Image info completed: $info');
-  //         // Adjust size
-  //         if (adaptSizeToImage) {
-  //           widget.element.changeSize(
-  //             Size(
-  //               info.image.width.toDouble(),
-  //               info.image.height.toDouble(),
-  //             ),
-  //           );
-  //         }
-  //         // Serialize image to save/load dashboard
-  //         final imageData =
-  //         await info.image.toByteData(format: ui.ImageByteFormat.png);
-  //         widget.element.serializedData =
-  //             base64Encode(imageData!.buffer.asUint8List());
-  //         ui.decodeImageFromList(imageData.buffer.asUint8List(), (image) {
-  //           debugPrint('Image decoding completed: $image');
-  //           // Render image
-  //           if (mounted) setState(() => _cachedImage = image);
-  //         });
-  //       },
-  //       onError: (exception, stackTrace) {
-  //         debugPrintStack(stackTrace: stackTrace);
-  //         if (mounted) setState(() => _error = exception.toString());
-  //       },
-  //     ),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +83,18 @@ class _ImageWidgetState extends State<ImageWidget> {
                       width: diameter,
                       height: diameter,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: diameter,
+                          height: diameter,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Icons.person,
+                              size: diameter * 0.5, color: Colors.grey[600]),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -139,37 +110,6 @@ class _ImageWidgetState extends State<ImageWidget> {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildImageWidget() {
-    if (_error != null) {
-      return Center(child: Text(_error!));
-    } else if (_cachedImage == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    // Calculate size for circular container
-    final size = math.min(
-      widget.element.size.width * 0.8,
-      widget.element.size.height * 0.6,
-    );
-
-    return Container(
-      width: size,
-      height: size,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.transparent,
-      ),
-      child: ClipOval(
-        child: RawImage(
-          image: _cachedImage,
-          width: size,
-          height: size,
-          fit: BoxFit.cover,
-        ),
       ),
     );
   }
