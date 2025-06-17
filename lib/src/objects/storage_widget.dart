@@ -27,7 +27,13 @@ class StorageWidget extends StatelessWidget {
               element: element,
             ),
           ),
-          ElementTextWidget(element: element),
+          ElementTextWidget(
+            text: element.text,
+            textColor: element.textColor,
+            textSize: element.textSize,
+            fontFamily: element.fontFamily,
+            isBold: element.textIsBold,
+          ),
         ],
       ),
     );
