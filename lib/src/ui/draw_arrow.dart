@@ -299,8 +299,9 @@ class ArrowPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..strokeWidth = params.thickness;
-
+    final paint = Paint()
+      ..strokeWidth = params.thickness
+      ..color = const Color(0xff2D8BBF);
     if (params.style == ArrowStyle.curve) {
       drawCurve(canvas, paint);
     } else if (params.style == ArrowStyle.segmented) {
