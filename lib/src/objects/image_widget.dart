@@ -40,14 +40,20 @@ class _ImageWidgetState extends State<ImageWidget> {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
+              color: Colors.white,
               border: Border.all(
                 color: widget.element.borderColor,
                 width: widget.element.borderThickness,
               ),
             ),
-            child: Image(
-              image: widget.imageProvider,
-              fit: BoxFit.cover,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image(
+                image: widget.imageProvider,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+              ),
             ),
           ),
         ),
