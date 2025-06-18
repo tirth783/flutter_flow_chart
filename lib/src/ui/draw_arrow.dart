@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_chart/flutter_flow_chart.dart';
@@ -310,7 +309,7 @@ class ArrowPainter extends CustomPainter {
       drawRectangularLine(canvas, paint);
     }
 
-    _drawArrowHead(canvas, from, to, paint, params.headRadius * 2);
+    canvas.drawCircle(to, params.headRadius, paint);
 
     paint
       ..color = params.color
@@ -416,25 +415,6 @@ class ArrowPainter extends CustomPainter {
       ..moveTo(p0.dx, p0.dy)
       ..conicTo(p1.dx, p1.dy, p2.dx, p2.dy, 1)
       ..conicTo(p3.dx, p3.dy, p4.dx, p4.dy, 1);
-  }
-
-  void _drawArrowHead(Canvas canvas, Offset from, Offset to, Paint paint, double size) {
-    final angle = (to - from).direction;
-    final path = Path()
-      ..moveTo(to.dx, to.dy)
-      ..lineTo(
-        to.dx - size * cos(angle - pi / 6),
-        to.dy - size * sin(angle - pi / 6),
-      )
-      ..lineTo(
-        to.dx - size * cos(angle + pi / 6),
-        to.dy - size * sin(angle + pi / 6),
-      )
-      ..close();
-    final oldStyle = paint.style;
-    paint.style = PaintingStyle.fill;
-    canvas.drawPath(path, paint);
-    paint.style = oldStyle;
   }
 
   @override
