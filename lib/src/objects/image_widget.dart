@@ -106,12 +106,26 @@ class _ImageWidgetState extends State<ImageWidget> {
               Expanded(
                 flex: 1,
                 child: Center(
-                  child: ElementTextWidget(
-                    text: widget.element.text,
-                    textColor: widget.element.textColor,
-                    textSize: widget.element.textSize,
-                    fontFamily: widget.element.fontFamily,
-                    isBold: widget.element.textIsBold,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (widget.element.text.isNotEmpty)
+                        ElementTextWidget(
+                          text: widget.element.text,
+                          textColor: widget.element.textColor,
+                          textSize: widget.element.textSize,
+                          fontFamily: widget.element.fontFamily,
+                          isBold: widget.element.textIsBold,
+                        ),
+                      if (widget.element.subText.isNotEmpty)
+                        ElementTextWidget(
+                          text: widget.element.subText,
+                          textColor: widget.element.subTextColor,
+                          textSize: widget.element.subTextSize,
+                          fontFamily: widget.element.fontFamily,
+                          isBold: widget.element.textIsBold,
+                        ),
+                    ],
                   ),
                 ),
               ),
