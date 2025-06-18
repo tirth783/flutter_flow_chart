@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_chart/src/elements/flow_element.dart';
@@ -11,8 +12,7 @@ class ImageWidget extends StatefulWidget {
     required this.element,
     super.key,
   })  : assert(
-          element.data is ImageProvider ||
-              (element.serializedData?.isNotEmpty ?? false),
+          element.data is ImageProvider || (element.serializedData?.isNotEmpty ?? false),
           'Missing image (\"data\" parameter should be an ImageProvider)',
         ),
         imageProvider = element.serializedData?.isNotEmpty ?? false
@@ -34,6 +34,11 @@ class ImageWidget extends StatefulWidget {
 class _ImageWidgetState extends State<ImageWidget> {
   @override
   Widget build(BuildContext context) {
+    final w = widget.element.size.width;
+    final h = widget.element.size.height;
+
+    final double diameter = math.min(w * 0.8, h * 0.6);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -51,8 +56,8 @@ class _ImageWidgetState extends State<ImageWidget> {
               child: Image(
                 image: widget.imageProvider,
                 fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
+                width: diameter,
+                height: diameter,
               ),
             ),
           ),
