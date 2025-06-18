@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_chart/flutter_flow_chart.dart';
@@ -15,6 +16,7 @@ enum ArrowStyle {
 
   /// A rectangular shaped line.
   rectangular,
+  arrow,
 }
 
 /// Arrow parameters used by [DrawArrow] widget
@@ -309,7 +311,7 @@ class ArrowPainter extends CustomPainter {
       drawRectangularLine(canvas, paint);
     }
 
-    canvas.drawCircle(to, params.headRadius, paint);
+    _drawArrowHead(canvas, to, from, paint);
 
     paint
       ..color = params.color
@@ -417,6 +419,26 @@ class ArrowPainter extends CustomPainter {
       ..conicTo(p3.dx, p3.dy, p4.dx, p4.dy, 1);
   }
 
+  void _drawArrowHead(Canvas canvas, Offset tip, Offset tail, Paint paint) {
+    const double arrowLength = 16;
+    const double arrowWidth = 10;
+    final angle = atan2(tip.dy - tail.dy, tip.dx - tail.dx);
+
+    final path = Path()
+      ..moveTo(tip.dx, tip.dy)
+      ..lineTo(
+        tip.dx - arrowLength * cos(angle - pi / 6),
+        tip.dy - arrowLength * sin(angle - pi / 6),
+      )
+      ..lineTo(
+        tip.dx - arrowLength * cos(angle + pi / 6),
+        tip.dy - arrowLength * sin(angle + pi / 6),
+      )
+      ..close();
+
+    canvas.drawPath(path, paint);
+  }
+
   @override
   bool shouldRepaint(ArrowPainter oldDelegate) {
     return true;
@@ -462,3 +484,5 @@ class PivotsNotifier extends ValueNotifier<List<Pivot>> {
     notifyListeners();
   }
 }
+
+final dashboard = Dashboard(defaultArrowStyle: ArrowStyle.arrow);
