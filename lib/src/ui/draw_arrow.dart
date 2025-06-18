@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_chart/flutter_flow_chart.dart';
 import 'package:flutter_flow_chart/src/ui/segment_handler.dart';
@@ -23,7 +24,7 @@ class ArrowParams extends ChangeNotifier {
     this.thickness = 1.7,
     this.headRadius = 6,
     double tailLength = 25.0,
-    this.color = Colors.black,
+    this.color = const Color(0xff2D8BBF),
     this.style,
     this.tension = 1.0,
     this.startArrowPosition = Alignment.centerRight,
@@ -51,8 +52,7 @@ class ArrowParams extends ChangeNotifier {
   }
 
   ///
-  factory ArrowParams.fromJson(String source) =>
-      ArrowParams.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory ArrowParams.fromJson(String source) => ArrowParams.fromMap(json.decode(source) as Map<String, dynamic>);
 
   /// Arrow thickness.
   double thickness;
@@ -235,22 +235,18 @@ class _DrawArrowState extends State<DrawArrow> {
     from = Offset(
       widget.srcElement.position.dx +
           widget.srcElement.handlerSize / 2.0 +
-          (widget.srcElement.size.width *
-              ((widget.arrowParams.startArrowPosition.x + 1) / 2)),
+          (widget.srcElement.size.width * ((widget.arrowParams.startArrowPosition.x + 1) / 2)),
       widget.srcElement.position.dy +
           widget.srcElement.handlerSize / 2.0 +
-          (widget.srcElement.size.height *
-              ((widget.arrowParams.startArrowPosition.y + 1) / 2)),
+          (widget.srcElement.size.height * ((widget.arrowParams.startArrowPosition.y + 1) / 2)),
     );
     to = Offset(
       widget.destElement.position.dx +
           widget.destElement.handlerSize / 2.0 +
-          (widget.destElement.size.width *
-              ((widget.arrowParams.endArrowPosition.x + 1) / 2)),
+          (widget.destElement.size.width * ((widget.arrowParams.endArrowPosition.x + 1) / 2)),
       widget.destElement.position.dy +
           widget.destElement.handlerSize / 2.0 +
-          (widget.destElement.size.height *
-              ((widget.arrowParams.endArrowPosition.y + 1) / 2)),
+          (widget.destElement.size.height * ((widget.arrowParams.endArrowPosition.y + 1) / 2)),
     );
 
     return RepaintBoundary(
@@ -409,9 +405,7 @@ class ArrowPainter extends CustomPainter {
     } else if (params.endArrowPosition.y < 0) {
       dy = -distance;
     }
-    final p3 = params.endArrowPosition == Alignment.center
-        ? Offset(to.dx, to.dy)
-        : Offset(to.dx + dx, to.dy + dy);
+    final p3 = params.endArrowPosition == Alignment.center ? Offset(to.dx, to.dy) : Offset(to.dx + dx, to.dy + dy);
     final p2 = Offset(
       p1.dx + (p3.dx - p1.dx) / 2,
       p1.dy + (p3.dy - p1.dy) / 2,

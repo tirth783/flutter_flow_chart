@@ -187,17 +187,15 @@ class _ElementHandler extends StatelessWidget {
             childWhenDragging: HandlerWidget(
               width: handlerSize,
               height: handlerSize,
-              backgroundColor: Colors.blue,
+              backgroundColor: const Color(0xff2D8BBF),
             ),
             data: {
               'srcElement': element,
               'alignment': alignment,
             },
             child: GestureDetector(
-              onTapDown: (details) =>
-                  tapDown = details.globalPosition - dashboard.position,
-              onSecondaryTapDown: (details) => secondaryTapDown =
-                  details.globalPosition - dashboard.position,
+              onTapDown: (details) => tapDown = details.globalPosition - dashboard.position,
+              onSecondaryTapDown: (details) => secondaryTapDown = details.globalPosition - dashboard.position,
               onTap: () {
                 onHandlerPressed?.call(
                   context,
@@ -241,14 +239,11 @@ class _ElementHandler extends StatelessWidget {
                   startArrowPosition: alignment,
                   endArrowPosition: Alignment.center,
                 );
-                DrawingArrow.instance.from =
-                    details.globalPosition - dashboard.position;
+                DrawingArrow.instance.from = details.globalPosition - dashboard.position;
                 isDragging = true;
               }
               DrawingArrow.instance.setTo(
-                details.globalPosition -
-                    dashboard.position +
-                    dashboard.handlerFeedbackOffset,
+                details.globalPosition - dashboard.position + dashboard.handlerFeedbackOffset,
               );
             },
             onDragEnd: (details) {
