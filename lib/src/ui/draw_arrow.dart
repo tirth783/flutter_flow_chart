@@ -16,7 +16,6 @@ enum ArrowStyle {
 
   /// A rectangular shaped line.
   rectangular,
-  arrow,
 }
 
 /// Arrow parameters used by [DrawArrow] widget
@@ -311,7 +310,7 @@ class ArrowPainter extends CustomPainter {
       drawRectangularLine(canvas, paint);
     }
 
-    _drawArrowHead(canvas, to, from, paint);
+    _drawArrowHead(canvas, from, to, paint, params.headRadius * 2);
 
     paint
       ..color = params.color
@@ -419,24 +418,23 @@ class ArrowPainter extends CustomPainter {
       ..conicTo(p3.dx, p3.dy, p4.dx, p4.dy, 1);
   }
 
-  void _drawArrowHead(Canvas canvas, Offset tip, Offset tail, Paint paint) {
-    const double arrowLength = 16;
-    const double arrowWidth = 10;
-    final angle = atan2(tip.dy - tail.dy, tip.dx - tail.dx);
-
+  void _drawArrowHead(Canvas canvas, Offset from, Offset to, Paint paint, double size) {
+    final angle = (to - from).direction;
     final path = Path()
-      ..moveTo(tip.dx, tip.dy)
+      ..moveTo(to.dx, to.dy)
       ..lineTo(
-        tip.dx - arrowLength * cos(angle - pi / 6),
-        tip.dy - arrowLength * sin(angle - pi / 6),
+        to.dx - size * cos(angle - pi / 6),
+        to.dy - size * sin(angle - pi / 6),
       )
       ..lineTo(
-        tip.dx - arrowLength * cos(angle + pi / 6),
-        tip.dy - arrowLength * sin(angle + pi / 6),
+        to.dx - size * cos(angle + pi / 6),
+        to.dy - size * sin(angle + pi / 6),
       )
       ..close();
-
+    final oldStyle = paint.style;
+    paint.style = PaintingStyle.fill;
     canvas.drawPath(path, paint);
+    paint.style = oldStyle;
   }
 
   @override
@@ -484,5 +482,3 @@ class PivotsNotifier extends ValueNotifier<List<Pivot>> {
     notifyListeners();
   }
 }
-
-final dashboard = Dashboard(defaultArrowStyle: ArrowStyle.arrow);
