@@ -153,8 +153,7 @@ class FlowElement extends ChangeNotifier {
   }
 
   ///
-  factory FlowElement.fromJson(String source) =>
-      FlowElement.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory FlowElement.fromJson(String source) => FlowElement.fromMap(json.decode(source) as Map<String, dynamic>);
 
   /// Unique id set when adding a [FlowElement] with [Dashboard.addElement()]
   String id;
@@ -229,7 +228,7 @@ class FlowElement extends ChangeNotifier {
   bool isEditingText;
 
   /// Kind-specific data
-  final dynamic data;
+  dynamic data;
 
   /// Kind-specific data to load/save
   String? serializedData;
@@ -355,9 +354,7 @@ class FlowElement extends ChangeNotifier {
   bool operator ==(covariant FlowElement other) {
     if (identical(this, other)) return true;
 
-    return other.id == id &&
-        other.serializedData == serializedData &&
-        other.data == data;
+    return other.id == id && other.serializedData == serializedData && other.data == data;
   }
 
   @override
