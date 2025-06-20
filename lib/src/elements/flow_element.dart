@@ -69,6 +69,7 @@ class FlowElement extends ChangeNotifier {
     Offset position = Offset.zero,
     this.size = Size.zero,
     this.text = '',
+    this.memberId = '',
     this.subText = '',
     this.textColor = Colors.black,
     this.subTextColor = Colors.grey,
@@ -113,6 +114,7 @@ class FlowElement extends ChangeNotifier {
         (map['size.height'] as num).toDouble(),
       ),
       text: map['text'] as String,
+      memberId: map['memberId'] as String,
       subText: map['subText'] as String,
       textColor: Color(map['textColor'] as int),
       subTextColor: Color(map['subTextColor'] as int),
@@ -166,6 +168,8 @@ class FlowElement extends ChangeNotifier {
 
   /// Element text
   String text;
+
+  String memberId;
 
   /// Element subText
   String subText;
@@ -270,6 +274,11 @@ class FlowElement extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setMemberId(String memberId) {
+    this.memberId = memberId;
+    notifyListeners();
+  }
+
   /// Set subText
   void setsubText(String subText) {
     this.subText = subText;
@@ -362,6 +371,7 @@ class FlowElement extends ChangeNotifier {
     return position.hashCode ^
         size.hashCode ^
         text.hashCode ^
+        memberId.hashCode ^
         subText.hashCode ^
         textColor.hashCode ^
         subTextColor.hashCode ^
@@ -393,6 +403,7 @@ class FlowElement extends ChangeNotifier {
       'size.width': size.width,
       'size.height': size.height,
       'text': text,
+      'memberId': memberId,
       'subText': subText,
       'textColor': textColor.value,
       'subTextColor': subTextColor.value,
