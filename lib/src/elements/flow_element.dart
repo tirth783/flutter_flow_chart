@@ -71,6 +71,7 @@ class FlowElement extends ChangeNotifier {
     this.text = '',
     this.memberId = '',
     this.subText = '',
+    this.mailId = '',
     this.textColor = Colors.black,
     this.subTextColor = Colors.grey,
     this.fontFamily,
@@ -116,6 +117,7 @@ class FlowElement extends ChangeNotifier {
       text: map['text'] as String,
       memberId: map['memberId'] as String,
       subText: map['subText'] as String,
+      mailId: map['mailId'] as String,
       textColor: Color(map['textColor'] as int),
       subTextColor: Color(map['subTextColor'] as int),
       fontFamily: map['fontFamily'] as String?,
@@ -173,6 +175,8 @@ class FlowElement extends ChangeNotifier {
 
   /// Element subText
   String subText;
+
+  String mailId;
 
   /// Text color
   Color textColor;
@@ -279,6 +283,11 @@ class FlowElement extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setMailId(String mailId) {
+    this.mailId = mailId;
+    notifyListeners();
+  }
+
   /// Set subText
   void setsubText(String subText) {
     this.subText = subText;
@@ -372,6 +381,7 @@ class FlowElement extends ChangeNotifier {
         size.hashCode ^
         text.hashCode ^
         memberId.hashCode ^
+        mailId.hashCode ^
         subText.hashCode ^
         textColor.hashCode ^
         subTextColor.hashCode ^
@@ -404,6 +414,7 @@ class FlowElement extends ChangeNotifier {
       'size.height': size.height,
       'text': text,
       'memberId': memberId,
+      'mailId': mailId,
       'subText': subText,
       'textColor': textColor.value,
       'subTextColor': subTextColor.value,
