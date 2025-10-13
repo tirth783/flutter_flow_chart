@@ -9,18 +9,28 @@ import 'package:flutter_flow_chart/src/ui/profile_icon_helper.dart';
 
 /// A kind of element
 class ImageWidget extends StatefulWidget {
-  /// Requires element.data to be an ImageProvider.
+  /// Renders an element image. Works with network, base64, asset, or no image.
   ImageWidget({required this.element, super.key})
-      : assert(
-          element.data is ImageProvider ||
-              (element.serializedData?.isNotEmpty ?? false),
-          'Missing image ("data" parameter should be an ImageProvider)',
-        ),
-        imageProvider = element.serializedData?.isNotEmpty ?? false
-            ? (element.serializedData!.startsWith('http')
-                ? NetworkImage(element.serializedData!)
-                : Image.memory(base64Decode(element.serializedData!)).image)
-            : element.data as ImageProvider;
+    : imageProvider = (() {
+        // Prefer serializedData when available
+        final sd = element.serializedData;
+        if (sd is String && sd.isNotEmpty) {
+          if (sd.startsWith('http')) {
+            return NetworkImage(sd);
+          }
+          try {
+            return Image.memory(base64Decode(sd)).image;
+          } catch (_) {
+            // fallthrough to data/provider/default
+          }
+        }
+        // Fallback to provided ImageProvider if present
+        if (element.data is ImageProvider) {
+          return element.data as ImageProvider;
+        }
+        // Default placeholder (will be replaced by icon in build)
+        return const AssetImage('assets/icons/ic_profile_tree.png');
+      })();
 
   /// The element to display
   final FlowElement element;
@@ -97,14 +107,13 @@ class _ImageWidgetState extends State<ImageWidget> {
                       builder: (context) {
                         final bool isDefaultAsset =
                             widget.imageProvider is AssetImage &&
-                                (widget.imageProvider as AssetImage)
-                                    .assetName
-                                    .contains('ic_profile_tree');
+                            (widget.imageProvider as AssetImage).assetName
+                                .contains('ic_profile_tree');
                         final bool noSerializedData =
                             (widget.element.serializedData == null) ||
-                                (widget.element.serializedData is String &&
-                                    (widget.element.serializedData as String)
-                                        .isEmpty);
+                            (widget.element.serializedData is String &&
+                                (widget.element.serializedData as String)
+                                    .isEmpty);
                         if (isDefaultAsset || noSerializedData) {
                           // Render crisp vector/icon fallback instead of blurry raster asset
                           return Container(
@@ -142,8 +151,8 @@ class _ImageWidgetState extends State<ImageWidget> {
                           filterQuality: FilterQuality.high,
                           frameBuilder:
                               (context, child, frame, wasSynchronouslyLoaded) {
-                            return child; // avoid fade to minimize flicker
-                          },
+                                return child; // avoid fade to minimize flicker
+                              },
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
                               width: diameter,
