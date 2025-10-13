@@ -24,6 +24,18 @@ class ImageWidget extends StatefulWidget {
             // fallthrough to data/provider/default
           }
         }
+        // If element.data is a base64/http string, use it
+        final data = element.data;
+        if (data is String && data.isNotEmpty) {
+          if (data.startsWith('http')) {
+            return NetworkImage(data);
+          }
+          try {
+            return Image.memory(base64Decode(data)).image;
+          } catch (_) {
+            // ignore, fallback to provider/default
+          }
+        }
         // Fallback to provided ImageProvider if present
         if (element.data is ImageProvider) {
           return element.data as ImageProvider;
