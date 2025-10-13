@@ -39,50 +39,54 @@ class FlowChart extends StatefulWidget {
 
   /// callback for long tap on dashboard
   final void Function(BuildContext context, Offset position)?
-      onDashboardLongTapped;
+  onDashboardLongTapped;
 
   /// callback for mouse right click on dashboard
   final void Function(BuildContext context, Offset postision)?
-      onDashboardSecondaryTapped;
+  onDashboardSecondaryTapped;
 
   /// callback for mouse right click long press on dashboard
   final void Function(BuildContext context, Offset position)?
-      onDashboardSecondaryLongTapped;
+  onDashboardSecondaryLongTapped;
 
   /// callback for element pressed
   final void Function(
     BuildContext context,
     Offset position,
     FlowElement element,
-  )? onElementPressed;
+  )?
+  onElementPressed;
 
   /// callback for mouse right click event on an element
   final void Function(
     BuildContext context,
     Offset position,
     FlowElement element,
-  )? onElementSecondaryTapped;
+  )?
+  onElementSecondaryTapped;
 
   /// callback for element long pressed
   final void Function(
     BuildContext context,
     Offset position,
     FlowElement element,
-  )? onElementLongPressed;
+  )?
+  onElementLongPressed;
 
   /// callback for right click long press event on an element
   final void Function(
     BuildContext context,
     Offset position,
     FlowElement element,
-  )? onElementSecondaryLongTapped;
+  )?
+  onElementSecondaryLongTapped;
 
   /// callback for onclick event of pivot
   final void Function(BuildContext context, Pivot pivot)? onPivotPressed;
 
   /// callback for secondary press event of pivot
   final void Function(BuildContext context, Pivot pivot)?
-      onPivotSecondaryPressed;
+  onPivotSecondaryPressed;
 
   /// callback for handler pressed
   final void Function(
@@ -90,7 +94,8 @@ class FlowChart extends StatefulWidget {
     Offset position,
     Handler handler,
     FlowElement element,
-  )? onHandlerPressed;
+  )?
+  onHandlerPressed;
 
   /// callback for handler right click event
   final void Function(
@@ -98,7 +103,8 @@ class FlowChart extends StatefulWidget {
     Offset position,
     Handler handler,
     FlowElement element,
-  )? onHandlerSecondaryTapped;
+  )?
+  onHandlerSecondaryTapped;
 
   /// callback for handler right click long press event
   final void Function(
@@ -106,7 +112,8 @@ class FlowChart extends StatefulWidget {
     Offset position,
     Handler handler,
     FlowElement element,
-  )? onHandlerSecondaryLongTapped;
+  )?
+  onHandlerSecondaryLongTapped;
 
   /// callback for handler long pressed
   final void Function(
@@ -114,7 +121,8 @@ class FlowChart extends StatefulWidget {
     Offset position,
     Handler handler,
     FlowElement element,
-  )? onHandlerLongPressed;
+  )?
+  onHandlerLongPressed;
 
   /// callback when adding a new connection
   final ConnectionListener? onNewConnection;
@@ -200,15 +208,15 @@ class _FlowChartState extends State<FlowChart> {
               onTap: widget.onDashboardTapped == null
                   ? null
                   : () => widget.onDashboardTapped!(
-                        gridKey.currentContext!,
-                        tapDownPos,
-                      ),
+                      gridKey.currentContext!,
+                      tapDownPos,
+                    ),
               onLongPress: widget.onDashboardLongTapped == null
                   ? null
                   : () => widget.onDashboardLongTapped!(
-                        gridKey.currentContext!,
-                        tapDownPos,
-                      ),
+                      gridKey.currentContext!,
+                      tapDownPos,
+                    ),
               onSecondaryTap: () {
                 widget.onDashboardSecondaryTapped?.call(
                   gridKey.currentContext!,
@@ -258,82 +266,87 @@ class _FlowChartState extends State<FlowChart> {
           // Draw elements
           for (int i = 0; i < widget.dashboard.elements.length; i++)
             ElementWidget(
-              key: UniqueKey(),
+              key: ValueKey(widget.dashboard.elements.elementAt(i).id),
               dashboard: widget.dashboard,
               element: widget.dashboard.elements.elementAt(i),
               onElementPressed: widget.onElementPressed == null
                   ? null
                   : (context, position) => widget.onElementPressed!(
-                        context,
-                        position,
-                        widget.dashboard.elements.elementAt(i),
-                      ),
+                      context,
+                      position,
+                      widget.dashboard.elements.elementAt(i),
+                    ),
               onElementSecondaryTapped: widget.onElementSecondaryTapped == null
                   ? null
                   : (context, position) => widget.onElementSecondaryTapped!(
-                        context,
-                        position,
-                        widget.dashboard.elements.elementAt(i),
-                      ),
+                      context,
+                      position,
+                      widget.dashboard.elements.elementAt(i),
+                    ),
               onElementLongPressed: widget.onElementLongPressed == null
                   ? null
                   : (context, position) => widget.onElementLongPressed!(
-                        context,
-                        position,
-                        widget.dashboard.elements.elementAt(i),
-                      ),
+                      context,
+                      position,
+                      widget.dashboard.elements.elementAt(i),
+                    ),
               onElementSecondaryLongTapped:
                   widget.onElementSecondaryLongTapped == null
-                      ? null
-                      : (context, position) =>
-                          widget.onElementSecondaryLongTapped!(
-                            context,
-                            position,
-                            widget.dashboard.elements.elementAt(i),
-                          ),
+                  ? null
+                  : (context, position) => widget.onElementSecondaryLongTapped!(
+                      context,
+                      position,
+                      widget.dashboard.elements.elementAt(i),
+                    ),
               onHandlerPressed: widget.onHandlerPressed == null
                   ? null
-                  : (context, position, handler, element) => widget
-                      .onHandlerPressed!(context, position, handler, element),
+                  : (context, position, handler, element) =>
+                        widget.onHandlerPressed!(
+                          context,
+                          position,
+                          handler,
+                          element,
+                        ),
               onHandlerSecondaryTapped: widget.onHandlerSecondaryTapped == null
                   ? null
                   : (context, position, handler, element) =>
-                      widget.onHandlerSecondaryTapped!(
-                        context,
-                        position,
-                        handler,
-                        element,
-                      ),
+                        widget.onHandlerSecondaryTapped!(
+                          context,
+                          position,
+                          handler,
+                          element,
+                        ),
               onHandlerLongPressed: widget.onHandlerLongPressed == null
                   ? null
                   : (context, position, handler, element) =>
-                      widget.onHandlerLongPressed!(
-                        context,
-                        position,
-                        handler,
-                        element,
-                      ),
+                        widget.onHandlerLongPressed!(
+                          context,
+                          position,
+                          handler,
+                          element,
+                        ),
               onHandlerSecondaryLongTapped:
                   widget.onHandlerSecondaryLongTapped == null
-                      ? null
-                      : (context, position, handler, element) =>
-                          widget.onHandlerSecondaryLongTapped!(
-                            context,
-                            position,
-                            handler,
-                            element,
-                          ),
+                  ? null
+                  : (context, position, handler, element) =>
+                        widget.onHandlerSecondaryLongTapped!(
+                          context,
+                          position,
+                          handler,
+                          element,
+                        ),
             ),
           // Draw arrows
           for (int i = 0; i < widget.dashboard.elements.length; i++)
             for (int n = 0; n < widget.dashboard.elements[i].next.length; n++)
               DrawArrow(
-                key: UniqueKey(),
+                key: ValueKey('${widget.dashboard.elements[i].id}_arrow_$n'),
                 srcElement: widget.dashboard.elements[i],
-                destElement: widget
-                    .dashboard.elements[widget.dashboard.findElementIndexById(
-                  widget.dashboard.elements[i].next[n].destElementId,
-                )],
+                destElement:
+                    widget.dashboard.elements[widget.dashboard
+                        .findElementIndexById(
+                          widget.dashboard.elements[i].next[n].destElementId,
+                        )],
                 arrowParams: widget.dashboard.elements[i].next[n].arrowParams,
                 pivots: widget.dashboard.elements[i].next[n].pivots,
               ),
@@ -342,11 +355,15 @@ class _FlowChartState extends State<FlowChart> {
             for (int n = 0; n < widget.dashboard.elements[i].next.length; n++)
               if (widget.dashboard.elements[i].next[n].arrowParams.style ==
                   ArrowStyle.segmented)
-                for (int j = 0;
-                    j < widget.dashboard.elements[i].next[n].pivots.length;
-                    j++)
+                for (
+                  int j = 0;
+                  j < widget.dashboard.elements[i].next[n].pivots.length;
+                  j++
+                )
                   SegmentHandler(
-                    key: UniqueKey(),
+                    key: ValueKey(
+                      '${widget.dashboard.elements[i].id}_seg_${n}_$j',
+                    ),
                     pivot: widget.dashboard.elements[i].next[n].pivots[j],
                     dashboard: widget.dashboard,
                     onPivotPressed: widget.onPivotPressed,

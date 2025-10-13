@@ -1,21 +1,18 @@
 import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
-import 'dart:io' show File;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_chart/src/elements/flow_element.dart';
 import 'package:flutter_flow_chart/src/objects/element_text_widget.dart';
+import 'package:flutter_flow_chart/src/ui/profile_icon_helper.dart';
 
 /// A kind of element
 class ImageWidget extends StatefulWidget {
   /// Requires element.data to be an ImageProvider.
-  ImageWidget({
-    required this.element,
-    super.key,
-  })  : assert(
-          element.data is ImageProvider ||
-              (element.serializedData?.isNotEmpty ?? false),
+  ImageWidget({required this.element, super.key})
+      : assert(
+          element.data is ImageProvider || (element.serializedData?.isNotEmpty ?? false),
           'Missing image ("data" parameter should be an ImageProvider)',
         ),
         imageProvider = element.serializedData?.isNotEmpty ?? false
@@ -45,10 +42,6 @@ class _ImageWidgetState extends State<ImageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('Rendering ImageWidget of size ${widget.element.size} '
-        'from provider ${widget.imageProvider.runtimeType} '
-        'and cachedImage $_cachedImage');
-
     final w = widget.element.size.width;
     final h = widget.element.size.height;
 
@@ -81,7 +74,11 @@ class _ImageWidgetState extends State<ImageWidget> {
                 child: Center(
                   child: ClipOval(
                     child: Image(
-                      image: widget.imageProvider,
+                      image: ResizeImage(
+                        widget.imageProvider,
+                        width: (diameter * 2).toInt(),
+                        height: (diameter * 2).toInt(),
+                      ),
                       width: diameter,
                       height: diameter,
                       fit: BoxFit.cover,
@@ -90,11 +87,22 @@ class _ImageWidgetState extends State<ImageWidget> {
                           width: diameter,
                           height: diameter,
                           decoration: BoxDecoration(
-                            color: Colors.grey[300],
+                            color: ProfileIconHelper.getGenderColor(
+                              widget.element.gender,
+                              opacity: 0.2,
+                            ),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.person,
-                              size: diameter * 0.5, color: Colors.grey[600]),
+                          child: Center(
+                            child: ProfileIconHelper.getProfileIcon(
+                              age: widget.element.age,
+                              gender: widget.element.gender,
+                              size: diameter * 0.5,
+                              color: ProfileIconHelper.getGenderColor(
+                                widget.element.gender,
+                              ),
+                            ),
+                          ),
                         );
                       },
                     ),

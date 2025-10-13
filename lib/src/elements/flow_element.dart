@@ -72,6 +72,8 @@ class FlowElement extends ChangeNotifier {
     this.memberId = '',
     this.subText = '',
     this.mailId = '',
+    this.age,
+    this.gender,
     this.textColor = Colors.black,
     this.subTextColor = Colors.grey,
     this.fontFamily,
@@ -97,67 +99,73 @@ class FlowElement extends ChangeNotifier {
     this.isConnectable = true,
     this.isDeletable = false,
     List<ConnectionParams>? next,
-  })  : next = next ?? [],
-        id = const Uuid().v4(),
-        isEditingText = false,
-        // fixing offset issue under extreme scaling
-        position = position -
-            Offset(
-              size.width / 2 + handlerSize / 2,
-              size.height / 2 + handlerSize / 2,
-            );
+  }) : next = next ?? [],
+       id = const Uuid().v4(),
+       isEditingText = false,
+       // fixing offset issue under extreme scaling
+       position =
+           position -
+           Offset(
+             size.width / 2 + handlerSize / 2,
+             size.height / 2 + handlerSize / 2,
+           );
 
   ///
   factory FlowElement.fromMap(Map<String, dynamic> map) {
-    final e = FlowElement(
-      size: Size(
-        (map['size.width'] as num).toDouble(),
-        (map['size.height'] as num).toDouble(),
-      ),
-      text: map['text'] as String,
-      memberId: map['memberId'] as String,
-      subText: map['subText'] as String,
-      mailId: map['mailId'] as String,
-      textColor: Color(map['textColor'] as int),
-      subTextColor: Color(map['subTextColor'] as int),
-      fontFamily: map['fontFamily'] as String?,
-      textSize: (map['textSize'] as num).toDouble(),
-      subTextSize: (map['subTextSize'] as num).toDouble(),
-      textIsBold: map['textIsBold'] as bool,
-      kind: ElementKind.values[map['kind'] as int],
-      handlers: List<Handler>.from(
-        (map['handlers'] as List<dynamic>).map<Handler>(
-          (x) => Handler.values[x as int],
-        ),
-      ),
-      handlerSize: (map['handlerSize'] as num).toDouble(),
-      backgroundColor: Color(map['backgroundColor'] as int),
-      borderColor: Color(map['borderColor'] as int),
-      borderThickness: (map['borderThickness'] as num).toDouble(),
-      elevation: (map['elevation'] as num).toDouble(),
-      next: (map['next'] as List).isNotEmpty
-          ? List<ConnectionParams>.from(
-              (map['next'] as List<dynamic>).map<dynamic>(
-                (x) => ConnectionParams.fromMap(x as Map<String, dynamic>),
+    final e =
+        FlowElement(
+            size: Size(
+              (map['size.width'] as num).toDouble(),
+              (map['size.height'] as num).toDouble(),
+            ),
+            text: map['text'] as String,
+            memberId: map['memberId'] as String,
+            subText: map['subText'] as String,
+            mailId: map['mailId'] as String,
+            age: map['age'] as int?,
+            gender: map['gender'] as String?,
+            textColor: Color(map['textColor'] as int),
+            subTextColor: Color(map['subTextColor'] as int),
+            fontFamily: map['fontFamily'] as String?,
+            textSize: (map['textSize'] as num).toDouble(),
+            subTextSize: (map['subTextSize'] as num).toDouble(),
+            textIsBold: map['textIsBold'] as bool,
+            kind: ElementKind.values[map['kind'] as int],
+            handlers: List<Handler>.from(
+              (map['handlers'] as List<dynamic>).map<Handler>(
+                (x) => Handler.values[x as int],
               ),
-            )
-          : [],
-      isDraggable: map['isDraggable'] as bool? ?? true,
-      isResizable: map['isResizable'] as bool? ?? false,
-      isConnectable: map['isConnectable'] as bool? ?? true,
-      isDeletable: map['isDeletable'] as bool? ?? false,
-    )
-      ..setId(map['id'] as String)
-      ..position = Offset(
-        (map['positionDx'] as num).toDouble(),
-        (map['positionDy'] as num).toDouble(),
-      )
-      ..serializedData = map['data'] as String?;
+            ),
+            handlerSize: (map['handlerSize'] as num).toDouble(),
+            backgroundColor: Color(map['backgroundColor'] as int),
+            borderColor: Color(map['borderColor'] as int),
+            borderThickness: (map['borderThickness'] as num).toDouble(),
+            elevation: (map['elevation'] as num).toDouble(),
+            next: (map['next'] as List).isNotEmpty
+                ? List<ConnectionParams>.from(
+                    (map['next'] as List<dynamic>).map<dynamic>(
+                      (x) =>
+                          ConnectionParams.fromMap(x as Map<String, dynamic>),
+                    ),
+                  )
+                : [],
+            isDraggable: map['isDraggable'] as bool? ?? true,
+            isResizable: map['isResizable'] as bool? ?? false,
+            isConnectable: map['isConnectable'] as bool? ?? true,
+            isDeletable: map['isDeletable'] as bool? ?? false,
+          )
+          ..setId(map['id'] as String)
+          ..position = Offset(
+            (map['positionDx'] as num).toDouble(),
+            (map['positionDy'] as num).toDouble(),
+          )
+          ..serializedData = map['data'] as String?;
     return e;
   }
 
   ///
-  factory FlowElement.fromJson(String source) => FlowElement.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory FlowElement.fromJson(String source) =>
+      FlowElement.fromMap(json.decode(source) as Map<String, dynamic>);
 
   /// Unique id set when adding a [FlowElement] with [Dashboard.addElement()]
   String id;
@@ -177,6 +185,12 @@ class FlowElement extends ChangeNotifier {
   String subText;
 
   String mailId;
+
+  /// Age for icon selection (optional)
+  int? age;
+
+  /// Gender for icon selection: 'male' or 'female' (optional)
+  String? gender;
 
   /// Text color
   Color textColor;
@@ -372,7 +386,9 @@ class FlowElement extends ChangeNotifier {
   bool operator ==(covariant FlowElement other) {
     if (identical(this, other)) return true;
 
-    return other.id == id && other.serializedData == serializedData && other.data == data;
+    return other.id == id &&
+        other.serializedData == serializedData &&
+        other.data == data;
   }
 
   @override
@@ -416,6 +432,8 @@ class FlowElement extends ChangeNotifier {
       'memberId': memberId,
       'mailId': mailId,
       'subText': subText,
+      'age': age,
+      'gender': gender,
       'textColor': textColor.value,
       'subTextColor': subTextColor.value,
       'fontFamily': fontFamily,
