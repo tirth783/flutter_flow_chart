@@ -58,22 +58,30 @@ class _ImageWidgetState extends State<ImageWidget> {
   ui.Image? _cachedImage;
   String? _error;
   ImageProvider? _resizedProvider;
+  double? _lastDiameter;
 
   void _prepareResizedProvider(double diameter) {
-    // Memoize resized provider to avoid recreating and causing flicker
-    _resizedProvider = ResizeImage(
-      widget.imageProvider,
-      width: (diameter * 2).toInt(),
-      height: (diameter * 2).toInt(),
-    );
+    // Only recreate if diameter changed significantly to avoid flicker
+    if (_resizedProvider == null || 
+        _lastDiameter == null || 
+        (diameter - _lastDiameter!).abs() > 5) {
+      _resizedProvider = ResizeImage(
+        widget.imageProvider,
+        width: (diameter * 2).toInt(),
+        height: (diameter * 2).toInt(),
+      );
+      _lastDiameter = diameter;
+    }
   }
 
   @override
   void didUpdateWidget(covariant ImageWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.imageProvider != widget.imageProvider ||
-        oldWidget.element.size != widget.element.size) {
-      _resizedProvider = null; // recompute on change
+    // Only reset if image provider actually changed (not on every rebuild)
+    if (oldWidget.imageProvider.runtimeType != widget.imageProvider.runtimeType ||
+        oldWidget.imageProvider != widget.imageProvider) {
+      _resizedProvider = null;
+      _lastDiameter = null;
     }
   }
 
@@ -114,8 +122,9 @@ class _ImageWidgetState extends State<ImageWidget> {
               Expanded(
                 flex: 3,
                 child: Center(
-                  child: ClipOval(
-                    child: Builder(
+                  child: RepaintBoundary(
+                    child: ClipOval(
+                      child: Builder(
                       builder: (context) {
                         final bool isDefaultAsset =
                             widget.imageProvider is AssetImage &&
@@ -127,25 +136,19 @@ class _ImageWidgetState extends State<ImageWidget> {
                                 (widget.element.serializedData as String)
                                     .isEmpty);
                         if (isDefaultAsset || noSerializedData) {
-                          // Render crisp vector/icon fallback instead of blurry raster asset
+                          // Render clean single icon for all profiles
                           return Container(
                             width: diameter,
                             height: diameter,
                             decoration: BoxDecoration(
-                              color: ProfileIconHelper.getGenderColor(
-                                widget.element.gender,
-                                opacity: 0.2,
-                              ),
+                              color: Colors.grey.shade200,
                               shape: BoxShape.circle,
                             ),
                             child: Center(
-                              child: ProfileIconHelper.getProfileIcon(
-                                age: widget.element.age,
-                                gender: widget.element.gender,
-                                size: diameter * 0.55,
-                                color: ProfileIconHelper.getGenderColor(
-                                  widget.element.gender,
-                                ),
+                              child: Icon(
+                                Icons.person,
+                                size: diameter * 0.6,
+                                color: Colors.grey.shade600,
                               ),
                             ),
                           );
@@ -166,30 +169,26 @@ class _ImageWidgetState extends State<ImageWidget> {
                                 return child; // avoid fade to minimize flicker
                               },
                           errorBuilder: (context, error, stackTrace) {
+                            // Clean fallback on error
                             return Container(
                               width: diameter,
                               height: diameter,
                               decoration: BoxDecoration(
-                                color: ProfileIconHelper.getGenderColor(
-                                  widget.element.gender,
-                                  opacity: 0.2,
-                                ),
+                                color: Colors.grey.shade200,
                                 shape: BoxShape.circle,
                               ),
                               child: Center(
-                                child: ProfileIconHelper.getProfileIcon(
-                                  age: widget.element.age,
-                                  gender: widget.element.gender,
-                                  size: diameter * 0.55,
-                                  color: ProfileIconHelper.getGenderColor(
-                                    widget.element.gender,
-                                  ),
+                                child: Icon(
+                                  Icons.person,
+                                  size: diameter * 0.6,
+                                  color: Colors.grey.shade600,
                                 ),
                               ),
                             );
                           },
                         );
                       },
+                      ),
                     ),
                   ),
                 ),
