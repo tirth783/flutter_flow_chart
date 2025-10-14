@@ -108,19 +108,40 @@ class _ElementWidgetState extends State<ElementWidget> {
 
     switch (widget.element.kind) {
       case ElementKind.diamond:
-        element = DiamondWidget(element: widget.element);
+        element = DiamondWidget(
+          key: ValueKey(widget.element.id),
+          element: widget.element,
+        );
       case ElementKind.storage:
-        element = StorageWidget(element: widget.element);
+        element = StorageWidget(
+          key: ValueKey(widget.element.id),
+          element: widget.element,
+        );
       case ElementKind.oval:
-        element = OvalWidget(element: widget.element);
+        element = OvalWidget(
+          key: ValueKey(widget.element.id),
+          element: widget.element,
+        );
       case ElementKind.parallelogram:
-        element = ParallelogramWidget(element: widget.element);
+        element = ParallelogramWidget(
+          key: ValueKey(widget.element.id),
+          element: widget.element,
+        );
       case ElementKind.hexagon:
-        element = HexagonWidget(element: widget.element);
+        element = HexagonWidget(
+          key: ValueKey(widget.element.id),
+          element: widget.element,
+        );
       case ElementKind.rectangle:
-        element = RectangleWidget(element: widget.element);
+        element = RectangleWidget(
+          key: ValueKey(widget.element.id),
+          element: widget.element,
+        );
       case ElementKind.image:
-        element = ImageWidget(element: widget.element);
+        element = ImageWidget(
+          key: ValueKey(widget.element.id),
+          element: widget.element,
+        );
     }
 
     // switch (widget.element.kind) {
@@ -259,10 +280,7 @@ class _ElementWidgetState extends State<ElementWidget> {
       child: Draggable<FlowElement>(
         data: widget.element,
         childWhenDragging: const SizedBox.shrink(),
-        feedback: Material(
-          color: Colors.transparent,
-          child: element,
-        ),
+        feedback: Material(color: Colors.transparent, child: element),
         child: element,
         onDragUpdate: (details) {
           widget.element.changePosition(
@@ -270,7 +288,9 @@ class _ElementWidgetState extends State<ElementWidget> {
           );
         },
         onDragEnd: (details) {
-          widget.element.changePosition(details.offset - widget.dashboard.position);
+          widget.element.changePosition(
+            details.offset - widget.dashboard.position,
+          );
         },
       ),
     );

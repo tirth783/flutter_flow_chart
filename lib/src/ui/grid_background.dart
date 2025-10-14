@@ -5,12 +5,14 @@ class GridBackgroundParams extends ChangeNotifier {
   /// [gridSquare] is the raw size of the grid square when scale is 1
   GridBackgroundParams({
     double gridSquare = 20.0,
-    this.gridThickness = 0.7,
+    this.gridThickness = 0.0,
     this.secondarySquareStep = 5,
-    this.backgroundColor = Colors.white,
-    this.gridColor = Colors.white,
+    Color? backgroundColor,
+    Color? gridColor,
     void Function(double scale)? onScaleUpdate,
-  }) : rawGridSquareSize = gridSquare {
+  })  : rawGridSquareSize = gridSquare,
+        backgroundColor = backgroundColor ?? const Color(0xFFFFFFFF),
+        gridColor = gridColor ?? const Color(0x00000000) {
     if (onScaleUpdate != null) {
       _onScaleUpdateListeners.add(onScaleUpdate);
     }
@@ -18,18 +20,32 @@ class GridBackgroundParams extends ChangeNotifier {
 
   ///
   factory GridBackgroundParams.fromMap(Map<String, dynamic> map) {
+    // Parse offset - handle both nested {offset: {dx, dy}} and flat {offset.dx, offset.dy} formats
+    double offsetDx = 0.0;
+    double offsetDy = 0.0;
+
+    if (map['offset'] != null && map['offset'] is Map) {
+      // Nested format: {offset: {dx: ..., dy: ...}}
+      final offsetMap = map['offset'] as Map<String, dynamic>;
+      offsetDx = ((offsetMap['dx'] ?? 0.0) as num).toDouble();
+      offsetDy = ((offsetMap['dy'] ?? 0.0) as num).toDouble();
+    } else {
+      // Flat format: {offset.dx: ..., offset.dy: ...}
+      offsetDx = ((map['offset.dx'] ?? 0.0) as num).toDouble();
+      offsetDy = ((map['offset.dy'] ?? 0.0) as num).toDouble();
+    }
+
     final params = GridBackgroundParams(
       gridSquare: ((map['gridSquare'] ?? 20.0) as num).toDouble(),
-      gridThickness: ((map['gridThickness'] ?? 0.7) as num).toDouble(),
+      gridThickness: ((map['gridThickness'] ?? 0.0) as num).toDouble(),
       secondarySquareStep: map['secondarySquareStep'] as int? ?? 5,
-      backgroundColor: Color(map['backgroundColor'] as int? ?? 0xFFFFFFFF),
-      gridColor: Color(map['gridColor'] as int? ?? 0xFFFFFFFF),
+      backgroundColor: Color(
+        map['backgroundColor'] as int? ?? 0xFFFFFFFF,
+      ),
+      gridColor: Color(map['gridColor'] as int? ?? 0x00000000),
     )
       ..scale = ((map['scale'] ?? 1.0) as num).toDouble()
-      .._offset = Offset(
-        ((map['offset.dx'] ?? 0.0) as num).toDouble(),
-        ((map['offset.dy'] ?? 0.0) as num).toDouble(),
-      );
+      .._offset = Offset(offsetDx, offsetDy);
 
     return params;
   }
@@ -74,6 +90,12 @@ class GridBackgroundParams extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Set the absolute offset value (not delta)
+  void setOffset(Offset newOffset) {
+    _offset = newOffset;
+    notifyListeners();
+  }
+
   ///
   void setScale(double factor, Offset focalPoint) {
     _offset = Offset(
@@ -97,8 +119,7 @@ class GridBackgroundParams extends ChangeNotifier {
   ///
   Map<String, dynamic> toMap() {
     return {
-      'offset.dx': _offset.dx,
-      'offset.dy': _offset.dy,
+      'offset': {'dx': _offset.dx, 'dy': _offset.dy},
       'scale': scale,
       'gridSquare': rawGridSquareSize,
       'gridThickness': gridThickness,
@@ -112,10 +133,7 @@ class GridBackgroundParams extends ChangeNotifier {
 /// Uses a CustomPainter to draw a grid with the given parameters
 class GridBackground extends StatelessWidget {
   ///
-  GridBackground({
-    super.key,
-    GridBackgroundParams? params,
-  }) : params = params ?? GridBackgroundParams();
+  GridBackground({super.key, GridBackgroundParams? params}) : params = params ?? GridBackgroundParams();
 
   /// Grid parameters
   final GridBackgroundParams params;
@@ -153,7 +171,6 @@ class _GridBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-
       // Background
       ..color = params.backgroundColor;
     canvas.drawRect(
@@ -161,7 +178,10 @@ class _GridBackgroundPainter extends CustomPainter {
       paint,
     );
 
-    // grid
+    // grid (skip if transparent or zero thickness)
+    if (params.gridColor.alpha == 0 || params.gridThickness == 0) {
+      return;
+    }
     paint
       ..color = params.gridColor
       ..style = PaintingStyle.stroke;

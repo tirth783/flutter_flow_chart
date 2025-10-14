@@ -77,8 +77,7 @@ class Dashboard extends ChangeNotifier {
   }
 
   ///
-  factory Dashboard.fromJson(String source) =>
-      Dashboard.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Dashboard.fromJson(String source) => Dashboard.fromMap(json.decode(source) as Map<String, dynamic>);
 
   /// The current elements in the dashboard
   List<FlowElement> elements;
@@ -228,8 +227,7 @@ class Dashboard extends ChangeNotifier {
     // find arrow that ends to this [src] inside [handler]
     for (final element in elements) {
       for (final conn in element.next) {
-        if (conn.arrowParams.endArrowPosition == handler.toAlignment() &&
-            conn.destElementId == src.id) {
+        if (conn.arrowParams.endArrowPosition == handler.toAlignment() && conn.destElementId == src.id) {
           conn.arrowParams.tension = tension;
           conn.arrowParams.style = style;
         }
@@ -376,9 +374,9 @@ class Dashboard extends ChangeNotifier {
         );
         if (conn.arrowParams.style != ArrowStyle.segmented) return;
 
-        newPoint = (element.getHandlerPosition(conn.arrowParams.endArrowPosition) +
-                src.getHandlerPosition(conn.arrowParams.startArrowPosition)) /
-            2;
+        newPoint =
+            (element.getHandlerPosition(conn.arrowParams.endArrowPosition) + src.getHandlerPosition(conn.arrowParams.startArrowPosition)) /
+                2;
       }
     } else {
       newPoint = point;
@@ -477,8 +475,7 @@ class Dashboard extends ChangeNotifier {
     for (final element in elements) {
       // applying new zoom
       element
-        ..position =
-            (element.position - focalPoint) / gridBackgroundParams.scale * factor + focalPoint
+        ..position = (element.position - focalPoint) / gridBackgroundParams.scale * factor + focalPoint
         ..setScale(gridBackgroundParams.scale, factor);
       for (final conn in element.next) {
         for (final pivot in conn.pivots) {
@@ -572,7 +569,7 @@ class Dashboard extends ChangeNotifier {
   /// recenter the dashboard
   void recenter() {
     final center = Offset(dashboardSize.width / 2, dashboardSize.height / 2);
-    gridBackgroundParams.offset = center;
+    gridBackgroundParams.setOffset(center);
     if (elements.isNotEmpty) {
       final currentDeviation = elements.first.position - center;
       for (final element in elements) {
