@@ -19,8 +19,7 @@ class ProfileIconHelper {
       return Icon(Icons.person, size: size, color: iconColor);
     }
 
-    final isMale =
-        gender.toLowerCase() == 'male' || gender.toLowerCase() == 'm';
+    final isMale = gender.toLowerCase() == 'male' || gender.toLowerCase() == 'm';
 
     // Categorize by age
     if (age < 13) {
@@ -49,8 +48,7 @@ class ProfileIconHelper {
       return Icons.person;
     }
 
-    final isMale =
-        gender.toLowerCase() == 'male' || gender.toLowerCase() == 'm';
+    final isMale = gender.toLowerCase() == 'male' || gender.toLowerCase() == 'm';
 
     // Material Icons don't have as granular age categories
     // but we can use face icons or person icons
@@ -67,19 +65,15 @@ class ProfileIconHelper {
   static Color getGenderColor(String? gender, {double opacity = 1.0}) {
     if (gender == null) return Colors.grey.withOpacity(opacity);
 
-    final isMale =
-        gender.toLowerCase() == 'male' || gender.toLowerCase() == 'm';
-    return isMale
-        ? Colors.blue.withOpacity(opacity)
-        : Colors.pink.withOpacity(opacity);
+    final isMale = gender.toLowerCase() == 'male' || gender.toLowerCase() == 'm';
+    return isMale ? Colors.blue.withOpacity(opacity) : Colors.pink.withOpacity(opacity);
   }
 
   /// Get descriptive label for age/gender combination
   static String getAgeGenderLabel({int? age, String? gender}) {
     if (age == null || gender == null) return 'Member';
 
-    final isMale =
-        gender.toLowerCase() == 'male' || gender.toLowerCase() == 'm';
+    final isMale = gender.toLowerCase() == 'male' || gender.toLowerCase() == 'm';
 
     if (age < 13) {
       return isMale ? 'Boy' : 'Girl';

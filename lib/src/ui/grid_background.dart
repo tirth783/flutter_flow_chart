@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 class GridBackgroundParams extends ChangeNotifier {
   /// [gridSquare] is the raw size of the grid square when scale is 1
   GridBackgroundParams({
-    double gridSquare = 20.0,
-    this.gridThickness = 0.0,
-    this.secondarySquareStep = 5,
+    double gridSquare = 22.0,
+    this.gridThickness = 0.5,
+    this.secondarySquareStep = 4,
     Color? backgroundColor,
     Color? gridColor,
     void Function(double scale)? onScaleUpdate,
   })  : rawGridSquareSize = gridSquare,
-        backgroundColor = backgroundColor ?? const Color(0xFFFFFFFF),
-        gridColor = gridColor ?? const Color(0x00000000) {
+        backgroundColor = backgroundColor ?? const Color(0xFFF9FAFD),
+        gridColor = gridColor ?? const Color(0xFFE9EDF5) {
     if (onScaleUpdate != null) {
       _onScaleUpdateListeners.add(onScaleUpdate);
     }

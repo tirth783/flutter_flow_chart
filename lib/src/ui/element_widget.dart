@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_chart/flutter_flow_chart.dart';
 import 'package:flutter_flow_chart/src/objects/diamond_widget.dart';
@@ -102,6 +103,28 @@ class _ElementWidgetState extends State<ElementWidget> {
     setState(() {});
   }
 
+  String _getImageKey(FlowElement element) {
+    // Create a stable key based on the image source to prevent unnecessary rebuilds
+    final sd = element.serializedData;
+    if (sd is String && sd.isNotEmpty) {
+      return sd;
+    }
+    final data = element.data;
+    if (data is String && data.isNotEmpty) {
+      return data;
+    }
+    if (data is ImageProvider) {
+      if (data is NetworkImage) {
+        return data.url;
+      } else if (data is FileImage) {
+        return data.file.path;
+      } else if (data is AssetImage) {
+        return data.assetName;
+      }
+    }
+    return 'default';
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget element;
@@ -138,8 +161,10 @@ class _ElementWidgetState extends State<ElementWidget> {
           element: widget.element,
         );
       case ElementKind.image:
+        // Create stable key based on element ID and image source to prevent unnecessary rebuilds
+        final imageKey = _getImageKey(widget.element);
         element = ImageWidget(
-          key: ValueKey(widget.element.id),
+          key: ValueKey('${widget.element.id}_$imageKey'),
           element: widget.element,
         );
     }

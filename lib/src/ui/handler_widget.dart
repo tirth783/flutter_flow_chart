@@ -33,19 +33,27 @@ class HandlerWidget extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.all(
-          Radius.circular(width),
-        ),
+        color: Colors.white,
+        shape: BoxShape.circle,
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x1A000000),
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
         border: Border.all(
           width: 2,
-          color: borderColor,
+          color: const Color(0xFF4BA3FF),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(4),
-        child: FittedBox(child: icon),
-      ),
+      // Only show inner content if an explicit icon is provided; otherwise empty to avoid inner dot when zooming
+      child: icon != null
+          ? Padding(
+              padding: const EdgeInsets.all(3),
+              child: FittedBox(child: icon),
+            )
+          : null,
     );
   }
 }

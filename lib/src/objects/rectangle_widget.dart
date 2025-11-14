@@ -22,16 +22,22 @@ class RectangleWidget extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: element.backgroundColor,
-              // boxShadow: [
-              //   if (element.elevation > 0.01)
-              //     BoxShadow(
-              //       color: Colors.grey,
-              //       offset: Offset(element.elevation, element.elevation),
-              //       blurRadius: element.elevation * 1.3,
-              //     ),
-              // ],
+              borderRadius: BorderRadius.circular(14),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white,
+                  element.backgroundColor.withOpacity(0.96),
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
               border: Border.all(
                 color: element.borderColor,
                 width: element.borderThickness,

@@ -13,6 +13,7 @@ dependencies:
 
   # https://pub.dev/packages/uuid
   uuid: ^4.4.0
+  rxdart: ^0.28.0
 
 dev_dependencies:
   flutter_test:

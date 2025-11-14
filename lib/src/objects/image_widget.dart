@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_flow_chart/src/elements/flow_element.dart';
+import 'package:flutter_flow_chart/flutter_flow_chart.dart';
 import 'package:flutter_flow_chart/src/objects/element_text_widget.dart';
 
 /// A kind of element
@@ -40,6 +40,27 @@ class ImageWidget extends StatefulWidget {
           }
           // Default placeholder (will be replaced by icon in build)
           return const AssetImage('assets/icons/ic_profile_tree.png');
+        })(),
+        _imageKey = (() {
+          // Create a stable key based on the image source to prevent unnecessary rebuilds
+          final sd = element.serializedData;
+          if (sd is String && sd.isNotEmpty) {
+            return sd;
+          }
+          final data = element.data;
+          if (data is String && data.isNotEmpty) {
+            return data;
+          }
+          if (data is ImageProvider) {
+            if (data is NetworkImage) {
+              return data.url;
+            } else if (data is FileImage) {
+              return data.file.path;
+            } else if (data is AssetImage) {
+              return data.assetName;
+            }
+          }
+          return '${element.id}_default';
         })();
 
   /// The element to display
@@ -47,6 +68,9 @@ class ImageWidget extends StatefulWidget {
 
   /// The image provider
   final ImageProvider imageProvider;
+  
+  /// Stable key for the image source to prevent unnecessary rebuilds
+  final String _imageKey;
 
   @override
   State<ImageWidget> createState() => _ImageWidgetState();
@@ -57,15 +81,40 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
   double? _lastDiameter;
   Widget? _cachedIconWidget;
   bool? _isDefaultIcon;
+  ImageProvider? _cachedImageProvider;
+  String? _cachedImageKey;
+  Widget? _cachedImageWidget;
+  double? _cachedImageDiameter;
 
   @override
   bool get wantKeepAlive => true;
+  
+  @override
+  void initState() {
+    super.initState();
+    // Initialize cached ImageProvider in initState to prevent recreation
+    _cachedImageProvider = widget.imageProvider;
+    _cachedImageKey = widget._imageKey;
+  }
+  
+  ImageProvider _getStableImageProvider() {
+    // Cache the ImageProvider to prevent unnecessary recreation
+    if (_cachedImageProvider != null && _cachedImageKey == widget._imageKey) {
+      return _cachedImageProvider!;
+    }
+    
+    // Use the widget's imageProvider if it's already set
+    _cachedImageProvider = widget.imageProvider;
+    _cachedImageKey = widget._imageKey;
+    return _cachedImageProvider!;
+  }
 
   void _prepareResizedProvider(double diameter) {
     // Only recreate if diameter changed significantly to avoid flicker
+    final stableProvider = _getStableImageProvider();
     if (_resizedProvider == null || _lastDiameter == null || (diameter - _lastDiameter!).abs() > 5) {
       _resizedProvider = ResizeImage(
-        widget.imageProvider,
+        stableProvider,
         width: (diameter * 2).toInt(),
         height: (diameter * 2).toInt(),
       );
@@ -76,18 +125,64 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
   Widget _buildDefaultIcon(double diameter) {
     // Cache the icon widget to prevent rebuilds
     if (_cachedIconWidget == null || _lastDiameter != diameter) {
-      _cachedIconWidget = Container(
-        width: diameter,
-        height: diameter,
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          Icons.person,
-          size: diameter * 0.6,
-          color: Colors.grey.shade600,
-        ),
+      final tintLight = ProfileIconHelper.getGenderColor(
+        widget.element.gender,
+        opacity: 0.12,
+      );
+      final ringColor = ProfileIconHelper.getGenderColor(
+        widget.element.gender,
+        opacity: 0.65,
+      );
+      final glyphColor = ProfileIconHelper.getGenderColor(
+        widget.element.gender,
+        opacity: 0.95,
+      );
+      final isYou = widget.element.subText.toLowerCase().contains('(you)');
+
+      final outerRing = isYou ? (diameter * 0.06).clamp(2.0, 5.0) : 0.0;
+      final innerRing = (diameter * 0.035).clamp(1.0, 3.0);
+      final contentSize = diameter - (outerRing * 2);
+
+      _cachedIconWidget = Stack(
+        alignment: Alignment.center,
+        children: [
+          if (isYou)
+            Container(
+              width: diameter,
+              height: diameter,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.blueAccent, width: outerRing),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blueAccent.withOpacity(0.25),
+                    blurRadius: 8,
+                    spreadRadius: 0.5,
+                  ),
+                ],
+              ),
+            ),
+          Container(
+            width: contentSize,
+            height: contentSize,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [Colors.white, tintLight],
+                stops: const [0.7, 1.0],
+              ),
+              border: Border.all(color: ringColor, width: innerRing),
+            ),
+          ),
+          Center(
+            child: ProfileIconHelper.getProfileIcon(
+              age: widget.element.age,
+              gender: widget.element.gender,
+              size: contentSize * 0.6,
+              color: glyphColor,
+            ),
+          ),
+        ],
       );
       _lastDiameter = diameter;
     }
@@ -95,10 +190,11 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
   }
 
   bool _shouldShowDefaultIcon() {
-    if (_isDefaultIcon != null) return _isDefaultIcon!;
+    if (_isDefaultIcon != null && _cachedImageKey == widget._imageKey) return _isDefaultIcon!;
 
-    final isDefaultAsset = widget.imageProvider is AssetImage &&
-        (widget.imageProvider as AssetImage).assetName.contains(
+    final stableProvider = _getStableImageProvider();
+    final isDefaultAsset = stableProvider is AssetImage &&
+        (stableProvider as AssetImage).assetName.contains(
               'ic_profile_tree',
             );
     final noSerializedData = (widget.element.serializedData == null) ||
@@ -108,15 +204,56 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
     return _isDefaultIcon as bool;
   }
 
+  bool _isSameImageProvider(ImageProvider a, ImageProvider b) {
+    if (a == b) return true;
+    if (a.runtimeType != b.runtimeType) return false;
+    
+    // Compare NetworkImage by URL
+    if (a is NetworkImage && b is NetworkImage) {
+      return a.url == b.url;
+    }
+    
+    // Compare FileImage by file path
+    if (a is FileImage && b is FileImage) {
+      return a.file.path == b.file.path;
+    }
+    
+    // Compare AssetImage by asset name
+    if (a is AssetImage && b is AssetImage) {
+      return a.assetName == b.assetName;
+    }
+    
+    // For other types, use reference equality
+    return false;
+  }
+
   @override
   void didUpdateWidget(covariant ImageWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Only reset if image provider actually changed (not on every rebuild)
-    if (oldWidget.imageProvider.runtimeType != widget.imageProvider.runtimeType || oldWidget.imageProvider != widget.imageProvider) {
+    // Only reset if image source actually changed (use stable key to prevent unnecessary resets)
+    final imageKeyChanged = oldWidget._imageKey != widget._imageKey;
+    
+    if (imageKeyChanged) {
+      // Image source changed, reset all cached data
+      _cachedImageProvider = null;
+      _cachedImageKey = null;
       _resizedProvider = null;
       _lastDiameter = null;
       _cachedIconWidget = null;
       _isDefaultIcon = null;
+      _cachedImageWidget = null;
+      _cachedImageDiameter = null;
+      // Initialize new cached provider
+      _cachedImageProvider = widget.imageProvider;
+      _cachedImageKey = widget._imageKey;
+    } else {
+      // Image source hasn't changed, keep using cached provider
+      // Don't reset anything - preserve all cached data to prevent blinking
+      // Only update cached provider if it's null (shouldn't happen, but safety check)
+      if (_cachedImageProvider == null) {
+        _cachedImageProvider = widget.imageProvider;
+        _cachedImageKey = widget._imageKey;
+      }
     }
   }
 
@@ -158,11 +295,21 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
                     child: _shouldShowDefaultIcon()
                         ? _buildDefaultIcon(diameter)
                         : ClipOval(
+                            key: ValueKey('${widget.element.id}_image_${widget._imageKey}'),
                             child: (() {
+                              // Use cached Image widget if diameter and image key haven't changed
+                              if (_cachedImageWidget != null && 
+                                  _cachedImageDiameter == diameter && 
+                                  _cachedImageKey == widget._imageKey) {
+                                return _cachedImageWidget!;
+                              }
+                              
                               if (_resizedProvider == null || (_lastDiameter != null && (diameter - _lastDiameter!).abs() > 8)) {
                                 _prepareResizedProvider(diameter);
                               }
-                              return Image(
+                              
+                              final imageWidget = Image(
+                                key: ValueKey('${widget.element.id}_img_${widget._imageKey}'),
                                 image: _resizedProvider!,
                                 width: diameter,
                                 height: diameter,
@@ -175,12 +322,19 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
                                   frame,
                                   wasSynchronouslyLoaded,
                                 ) {
-                                  return child; // avoid fade to minimize flicker
+                                  // Return child immediately to avoid fade and minimize flicker
+                                  return child;
                                 },
                                 errorBuilder: (context, error, stackTrace) {
                                   return _buildDefaultIcon(diameter);
                                 },
                               );
+                              
+                              // Cache the Image widget
+                              _cachedImageWidget = imageWidget;
+                              _cachedImageDiameter = diameter;
+                              
+                              return imageWidget;
                             })(),
                           ),
                   ),

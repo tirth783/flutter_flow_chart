@@ -375,12 +375,27 @@ class _DrawingArrowWidgetState extends State<DrawingArrowWidget> {
   @override
   Widget build(BuildContext context) {
     if (DrawingArrow.instance.isZero()) return const SizedBox.shrink();
+    // Compute a simple direction from current temp arrow to orient head
+    final to = DrawingArrow.instance.to;
+    final from = DrawingArrow.instance.from;
+    final direction = _getDirection(to, from);
     return CustomPaint(
       painter: ArrowPainter(
         params: DrawingArrow.instance.params,
-        from: DrawingArrow.instance.from,
-        to: DrawingArrow.instance.to,
+        from: from,
+        to: to,
+        direction: direction,
       ),
     );
+  }
+
+  String _getDirection(Offset to, Offset from) {
+    final dx = to.dx - from.dx;
+    final dy = to.dy - from.dy;
+    if (dx.abs() > dy.abs()) {
+      return dx > 0 ? 'Right' : 'Left';
+    } else {
+      return dy > 0 ? 'Bottom' : 'Top';
+    }
   }
 }
