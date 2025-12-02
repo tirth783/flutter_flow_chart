@@ -216,10 +216,12 @@ class _ElementWidgetState extends State<ElementWidget> {
     }
 
     if (widget.element.isDraggable) {
+      // Element is draggable: wrap with drag logic
       element = _buildDraggableWidget(element);
     } else {
-      // Since element is not draggable, move the grid when dragging on it
-      element = IgnorePointer(child: element);
+      // Element is not draggable: keep it interactive for taps,
+      // but do not allow dragging the element itself.
+      // (Grid panning is still handled by the background gestures.)
     }
 
     var tapLocation = Offset.zero;
