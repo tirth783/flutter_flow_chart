@@ -7,11 +7,13 @@ class RectangleWidget extends StatelessWidget {
   ///
   const RectangleWidget({
     required this.element,
+    required this.pressDelete,
     super.key,
   });
 
   ///
   final FlowElement element;
+  final Function() pressDelete;
 
   @override
   Widget build(BuildContext context) {

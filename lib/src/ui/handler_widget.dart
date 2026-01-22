@@ -10,6 +10,7 @@ class HandlerWidget extends StatelessWidget {
     this.backgroundColor = Colors.white,
     this.borderColor = const Color(0xffC3C6D5),
     this.icon,
+    this.isBorderNeeded = true,
   });
 
   ///
@@ -17,6 +18,9 @@ class HandlerWidget extends StatelessWidget {
 
   ///
   final double height;
+
+  ///
+  final bool isBorderNeeded;
 
   ///
   final Color backgroundColor;
@@ -32,21 +36,25 @@ class HandlerWidget extends StatelessWidget {
     return Container(
       width: width,
       height: height,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x1A000000),
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
-        border: Border.all(
-          width: 2,
-          color: const Color(0xFF4BA3FF),
-        ),
-      ),
+      decoration: isBorderNeeded
+          ? BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x1A000000),
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+              border: isBorderNeeded
+                  ? Border.all(
+                      width: 2,
+                      color: const Color(0xFF4BA3FF),
+                    )
+                  : null,
+            )
+          : null,
       // Only show inner content if an explicit icon is provided; otherwise empty to avoid inner dot when zooming
       child: icon != null
           ? Padding(

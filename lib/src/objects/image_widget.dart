@@ -8,8 +8,11 @@ import 'package:flutter_flow_chart/src/objects/element_text_widget.dart';
 /// A kind of element
 class ImageWidget extends StatefulWidget {
   /// Renders an element image. Works with network, base64, asset, or no image.
-  ImageWidget({required this.element, super.key})
-      : imageProvider = (() {
+  ImageWidget({
+    required this.element,
+    super.key,
+    required this.pressDelete,
+  })  : imageProvider = (() {
           // Prefer serializedData when available
           final sd = element.serializedData;
           if (sd is String && sd.isNotEmpty) {
@@ -65,10 +68,11 @@ class ImageWidget extends StatefulWidget {
 
   /// The element to display
   final FlowElement element;
+  final Function() pressDelete;
 
   /// The image provider
   final ImageProvider imageProvider;
-  
+
   /// Stable key for the image source to prevent unnecessary rebuilds
   final String _imageKey;
 
@@ -88,7 +92,7 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
 
   @override
   bool get wantKeepAlive => true;
-  
+
   @override
   void initState() {
     super.initState();
@@ -96,13 +100,13 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
     _cachedImageProvider = widget.imageProvider;
     _cachedImageKey = widget._imageKey;
   }
-  
+
   ImageProvider _getStableImageProvider() {
     // Cache the ImageProvider to prevent unnecessary recreation
     if (_cachedImageProvider != null && _cachedImageKey == widget._imageKey) {
       return _cachedImageProvider!;
     }
-    
+
     // Use the widget's imageProvider if it's already set
     _cachedImageProvider = widget.imageProvider;
     _cachedImageKey = widget._imageKey;
@@ -197,8 +201,7 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
         (stableProvider as AssetImage).assetName.contains(
               'ic_profile_tree',
             );
-    final noSerializedData = (widget.element.serializedData == null) ||
-        (widget.element.serializedData is String && (widget.element.serializedData as String).isEmpty);
+    final noSerializedData = (widget.element.serializedData == null) || (widget.element.serializedData is String && (widget.element.serializedData as String).isEmpty);
 
     _isDefaultIcon = isDefaultAsset || noSerializedData;
     return _isDefaultIcon as bool;
@@ -207,22 +210,22 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
   bool _isSameImageProvider(ImageProvider a, ImageProvider b) {
     if (a == b) return true;
     if (a.runtimeType != b.runtimeType) return false;
-    
+
     // Compare NetworkImage by URL
     if (a is NetworkImage && b is NetworkImage) {
       return a.url == b.url;
     }
-    
+
     // Compare FileImage by file path
     if (a is FileImage && b is FileImage) {
       return a.file.path == b.file.path;
     }
-    
+
     // Compare AssetImage by asset name
     if (a is AssetImage && b is AssetImage) {
       return a.assetName == b.assetName;
     }
-    
+
     // For other types, use reference equality
     return false;
   }
@@ -232,7 +235,7 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
     super.didUpdateWidget(oldWidget);
     // Only reset if image source actually changed (use stable key to prevent unnecessary resets)
     final imageKeyChanged = oldWidget._imageKey != widget._imageKey;
-    
+
     if (imageKeyChanged) {
       // Image source changed, reset all cached data
       _cachedImageProvider = null;
@@ -298,16 +301,14 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
                             key: ValueKey('${widget.element.id}_image_${widget._imageKey}'),
                             child: (() {
                               // Use cached Image widget if diameter and image key haven't changed
-                              if (_cachedImageWidget != null && 
-                                  _cachedImageDiameter == diameter && 
-                                  _cachedImageKey == widget._imageKey) {
+                              if (_cachedImageWidget != null && _cachedImageDiameter == diameter && _cachedImageKey == widget._imageKey) {
                                 return _cachedImageWidget!;
                               }
-                              
+
                               if (_resizedProvider == null || (_lastDiameter != null && (diameter - _lastDiameter!).abs() > 8)) {
                                 _prepareResizedProvider(diameter);
                               }
-                              
+
                               final imageWidget = Image(
                                 key: ValueKey('${widget.element.id}_img_${widget._imageKey}'),
                                 image: _resizedProvider!,
@@ -329,18 +330,17 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
                                   return _buildDefaultIcon(diameter);
                                 },
                               );
-                              
+
                               // Cache the Image widget
                               _cachedImageWidget = imageWidget;
                               _cachedImageDiameter = diameter;
-                              
+
                               return imageWidget;
                             })(),
                           ),
                   ),
                 ),
               ),
-
               // Text beneath
               Expanded(
                 flex: 1,

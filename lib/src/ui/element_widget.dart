@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_chart/flutter_flow_chart.dart';
 import 'package:flutter_flow_chart/src/objects/diamond_widget.dart';
@@ -19,6 +18,7 @@ class ElementWidget extends StatefulWidget {
     required this.element,
     super.key,
     this.onElementPressed,
+    this.onElementDeletePressed,
     this.onElementSecondaryTapped,
     this.onElementLongPressed,
     this.onElementSecondaryLongTapped,
@@ -36,6 +36,7 @@ class ElementWidget extends StatefulWidget {
 
   ///
   final void Function(BuildContext context, Offset position)? onElementPressed;
+  final void Function(BuildContext context, Offset position)? onElementDeletePressed;
 
   ///
   final void Function(BuildContext context, Offset position)? onElementSecondaryTapped;
@@ -86,6 +87,8 @@ class _ElementWidgetState extends State<ElementWidget> {
   // local widget touch position when start dragging
   Offset delta = Offset.zero;
   late Size elementStartSize;
+  Offset tapLocation = Offset.zero;
+  Offset secondaryTapDownPos = Offset.zero;
 
   @override
   void initState() {
@@ -159,6 +162,10 @@ class _ElementWidgetState extends State<ElementWidget> {
         element = RectangleWidget(
           key: ValueKey(widget.element.id),
           element: widget.element,
+          pressDelete: () {
+            var tapLocation = Offset.zero;
+            widget.onElementDeletePressed?.call(context, tapLocation);
+          },
         );
       case ElementKind.image:
         // Create stable key based on element ID and image source to prevent unnecessary rebuilds
@@ -166,6 +173,10 @@ class _ElementWidgetState extends State<ElementWidget> {
         element = ImageWidget(
           key: ValueKey('${widget.element.id}_$imageKey'),
           element: widget.element,
+          pressDelete: () {
+            var tapLocation = Offset.zero;
+            widget.onElementDeletePressed?.call(context, tapLocation);
+          },
         );
     }
 
@@ -224,8 +235,6 @@ class _ElementWidgetState extends State<ElementWidget> {
       // (Grid panning is still handled by the background gestures.)
     }
 
-    var tapLocation = Offset.zero;
-    var secondaryTapDownPos = Offset.zero;
     element = GestureDetector(
       onTapDown: (details) => tapLocation = details.globalPosition,
       onSecondaryTapDown: (details) => secondaryTapDownPos = details.globalPosition,
@@ -253,7 +262,12 @@ class _ElementWidgetState extends State<ElementWidget> {
           children: [
             element,
             if (widget.element.isResizable) _buildResizeHandle(),
-            if (widget.element.isDeletable) _buildDeleteHandle(),
+            if (widget.element.isDeletable)
+              _buildDeleteHandle(
+                () {
+                  widget.onElementPressed?.call(context, tapLocation);
+                },
+              ),
           ],
         ),
       ),
@@ -283,16 +297,18 @@ class _ElementWidgetState extends State<ElementWidget> {
     );
   }
 
-  Widget _buildDeleteHandle() {
+  Widget _buildDeleteHandle(Function() itemClick) {
     return Listener(
       onPointerUp: (event) {
-        widget.dashboard.removeElement(widget.element);
+        // widget.dashboard.removeElement(widget.element);
+        widget.onElementDeletePressed?.call(context, tapLocation);
       },
       child: const Align(
-        alignment: Alignment.topRight,
+        alignment: Alignment.bottomRight,
         child: HandlerWidget(
-          width: 25,
-          height: 25,
+          width: 22,
+          height: 22,
+          isBorderNeeded: false,
           icon: Icon(Icons.remove_circle_rounded),
         ),
       ),

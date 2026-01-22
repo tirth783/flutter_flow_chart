@@ -17,6 +17,7 @@ class FlowChart extends StatefulWidget {
     required this.dashboard,
     super.key,
     this.onElementPressed,
+    this.onElementDeletePressed,
     this.onElementSecondaryTapped,
     this.onElementLongPressed,
     this.onElementSecondaryLongTapped,
@@ -52,6 +53,12 @@ class FlowChart extends StatefulWidget {
     Offset position,
     FlowElement element,
   )? onElementPressed;
+
+  final void Function(
+    BuildContext context,
+    Offset position,
+    FlowElement element,
+  )? onElementDeletePressed;
 
   /// callback for mouse right click event on an element
   final void Function(
@@ -262,6 +269,13 @@ class _FlowChartState extends State<FlowChart> {
                         position,
                         widget.dashboard.elements.elementAt(i),
                       ),
+              onElementDeletePressed: widget.onElementDeletePressed == null
+                  ? null
+                  : (context, position) => widget.onElementDeletePressed!(
+                        context,
+                        position,
+                        widget.dashboard.elements.elementAt(i),
+                      ),
               onElementSecondaryTapped: widget.onElementSecondaryTapped == null
                   ? null
                   : (context, position) => widget.onElementSecondaryTapped!(
@@ -283,9 +297,7 @@ class _FlowChartState extends State<FlowChart> {
                         position,
                         widget.dashboard.elements.elementAt(i),
                       ),
-              onHandlerPressed: widget.onHandlerPressed == null
-                  ? null
-                  : (context, position, handler, element) => widget.onHandlerPressed!(context, position, handler, element),
+              onHandlerPressed: widget.onHandlerPressed == null ? null : (context, position, handler, element) => widget.onHandlerPressed!(context, position, handler, element),
               onHandlerSecondaryTapped: widget.onHandlerSecondaryTapped == null
                   ? null
                   : (context, position, handler, element) => widget.onHandlerSecondaryTapped!(
