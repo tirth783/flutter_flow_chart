@@ -9,6 +9,10 @@ import 'package:flutter_flow_chart/src/objects/rectangle_widget.dart';
 import 'package:flutter_flow_chart/src/objects/storage_widget.dart';
 import 'package:flutter_flow_chart/src/ui/element_handlers.dart';
 import 'package:flutter_flow_chart/src/ui/handler_widget.dart';
+import 'dart:math' as math;
+
+/// Fixed size (logical px) of the delete handle. Does not change with zoom.
+const double _kDeleteHandleScreenSize = 28.0;
 
 /// Widget that use [element] properties to display it on the dashboard scene
 class ElementWidget extends StatefulWidget {
@@ -253,63 +257,75 @@ class _ElementWidgetState extends State<ElementWidget> {
       child: element,
     );
 
+    // Reserve enough space so *all* handles fit inside the widget bounds.
+    // Delete handle uses fixed size (_kDeleteHandleScreenSize) — no change with zoom.
+    final baseHandlerSize = widget.element.handlerSize;
+    final resizeHandleSize = widget.element.isResizable ? baseHandlerSize * 1.5 : baseHandlerSize;
+    final deleteHandleSize = widget.element.isDeletable ? _kDeleteHandleScreenSize : 0.0;
+    final reservedHandleSize = math.max(
+      baseHandlerSize,
+      math.max(resizeHandleSize, deleteHandleSize),
+    );
+    final extraInset = (reservedHandleSize - baseHandlerSize) / 2;
+
     return Transform.translate(
       offset: widget.element.position,
       child: SizedBox(
-        width: widget.element.size.width + widget.element.handlerSize,
-        height: widget.element.size.height + widget.element.handlerSize,
+        width: widget.element.size.width + reservedHandleSize,
+        height: widget.element.size.height + reservedHandleSize,
         child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            element,
-            if (widget.element.isResizable) _buildResizeHandle(),
-            if (widget.element.isDeletable)
-              _buildDeleteHandle(
-                () {
-                  widget.onElementPressed?.call(context, tapLocation);
-                },
-              ),
+            Padding(
+              padding: EdgeInsets.all(extraInset),
+              child: element,
+            ),
+            if (widget.element.isResizable) _buildResizeHandle(reservedHandleSize),
+            if (widget.element.isDeletable) _buildDeleteHandle(reservedHandleSize),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildResizeHandle() {
-    return Listener(
-      onPointerDown: (event) {
-        elementStartSize = widget.element.size;
-      },
-      onPointerMove: (event) {
-        elementStartSize += event.localDelta;
-        widget.element.changeSize(elementStartSize);
-      },
-      onPointerUp: (event) {
-        // widget.dashboard.setElementResizable(widget.element, false);
-      },
-      child: const Align(
-        alignment: Alignment.bottomRight,
+  Widget _buildResizeHandle(double reservedHandleSize) {
+    final handleSize = widget.element.handlerSize * 1.5;
+    return Positioned(
+      right: reservedHandleSize / 2 - handleSize / 2,
+      bottom: reservedHandleSize / 2 - handleSize / 2,
+      child: Listener(
+        onPointerDown: (event) {
+          elementStartSize = widget.element.size;
+        },
+        onPointerMove: (event) {
+          elementStartSize += event.localDelta;
+          widget.element.changeSize(elementStartSize);
+        },
         child: HandlerWidget(
-          width: 20,
-          height: 20,
-          icon: Icon(Icons.compare_arrows),
+          width: handleSize,
+          height: handleSize,
+          icon: const Icon(Icons.compare_arrows),
         ),
       ),
     );
   }
 
-  Widget _buildDeleteHandle(Function() itemClick) {
-    return Listener(
-      onPointerUp: (event) {
-        // widget.dashboard.removeElement(widget.element);
-        widget.onElementDeletePressed?.call(context, tapLocation);
-      },
-      child: const Align(
-        alignment: Alignment.bottomRight,
+  Widget _buildDeleteHandle(double reservedHandleSize) {
+    // Fixed size in logical pixels — does not increase or decrease with zoom.
+    final handleSize = _kDeleteHandleScreenSize;
+    return Positioned(
+      right: reservedHandleSize / 2 - handleSize / 2,
+      bottom: reservedHandleSize / 2 - handleSize / 2,
+      child: Listener(
+        onPointerUp: (event) {
+          // widget.dashboard.removeElement(widget.element);
+          widget.onElementDeletePressed?.call(context, tapLocation);
+        },
         child: HandlerWidget(
-          width: 22,
-          height: 22,
+          width: handleSize,
+          height: handleSize,
           isBorderNeeded: false,
-          icon: Icon(Icons.remove_circle_rounded),
+          icon: const Icon(Icons.remove_circle_rounded),
         ),
       ),
     );
