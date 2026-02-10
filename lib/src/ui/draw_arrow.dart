@@ -773,12 +773,16 @@
 import 'dart:async'; // Add this import for Timer
 import 'dart:convert';
 import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_chart/flutter_flow_chart.dart';
 import 'package:flutter_flow_chart/src/ui/segment_handler.dart';
 import 'package:flutter_flow_chart/src/utils/stream_builder.dart';
+
+/// Must match [ElementWidget]'s delete handle size — used to compute handler offset.
+const double _kDeleteHandleScreenSize = 28.0;
 
 /// Arrow style enumeration
 enum ArrowStyle {
@@ -868,8 +872,7 @@ class ArrowParams extends ChangeNotifier {
   }
 
   ///
-  factory ArrowParams.fromJson(String source) =>
-      ArrowParams.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory ArrowParams.fromJson(String source) => ArrowParams.fromMap(json.decode(source) as Map<String, dynamic>);
 
   /// Arrow thickness.
   double thickness;
@@ -1014,8 +1017,7 @@ class DrawArrow extends StatefulWidget {
     super.key,
     ArrowParams? arrowParams,
     this.clickedColor = Colors.red, // Color when clicked
-    this.clickDuration =
-        const Duration(seconds: 3), // Duration to show clicked color
+    this.clickDuration = const Duration(seconds: 3), // Duration to show clicked color
   })  : arrowParams = arrowParams ?? ArrowParams(),
         pivots = PivotsNotifier(pivots);
 
@@ -1159,39 +1161,50 @@ class _DrawArrowState extends State<DrawArrow> {
   //   }
   // }
 
+  /// Computes the extra inset applied by [ElementWidget] when delete/resize handles exist.
+  /// Arrow endpoints must match the handler positions, which are offset by this inset.
+  static double _extraInsetFor(FlowElement element) {
+    final base = element.handlerSize;
+    final resize = element.isResizable ? base * 1.5 : base;
+    final delete = element.isDeletable ? _kDeleteHandleScreenSize : 0.0;
+    final reserved = math.max(base, math.max(resize, delete));
+    return (reserved - base) / 2;
+  }
+
   @override
   Widget build(BuildContext context) {
     var from = Offset.zero;
     var to = Offset.zero;
     var direction = 'Empty';
 
+    final srcInset = _extraInsetFor(widget.srcElement);
+    final destInset = _extraInsetFor(widget.destElement);
+
     from = Offset(
       widget.srcElement.position.dx +
+          srcInset +
           widget.srcElement.handlerSize / 2.0 +
-          (widget.srcElement.size.width *
-              ((widget.arrowParams.startArrowPosition.x + 1) / 2)),
+          (widget.srcElement.size.width * ((widget.arrowParams.startArrowPosition.x + 1) / 2)),
       widget.srcElement.position.dy +
+          srcInset +
           widget.srcElement.handlerSize / 2.0 +
-          (widget.srcElement.size.height *
-              ((widget.arrowParams.startArrowPosition.y + 1) / 2)),
+          (widget.srcElement.size.height * ((widget.arrowParams.startArrowPosition.y + 1) / 2)),
     );
     to = Offset(
       widget.destElement.position.dx +
+          destInset +
           widget.destElement.handlerSize / 2.0 +
-          (widget.destElement.size.width *
-              ((widget.arrowParams.endArrowPosition.x + 1) / 2)),
+          (widget.destElement.size.width * ((widget.arrowParams.endArrowPosition.x + 1) / 2)),
       widget.destElement.position.dy +
+          destInset +
           widget.destElement.handlerSize / 2.0 +
-          (widget.destElement.size.height *
-              ((widget.arrowParams.endArrowPosition.y + 1) / 2)),
+          (widget.destElement.size.height * ((widget.arrowParams.endArrowPosition.y + 1) / 2)),
     );
 
-    direction = getOffsetDirection(
-        to, widget.destElement.position, widget.destElement.size);
+    direction = getOffsetDirection(to, widget.destElement.position, widget.destElement.size);
 
-    final currentArrowParams = _isClicked
-        ? widget.arrowParams.copyWith(color: widget.clickedColor)
-        : widget.arrowParams;
+    final currentArrowParams =
+        _isClicked ? widget.arrowParams.copyWith(color: widget.clickedColor) : widget.arrowParams;
     //final currentArrowParams = _isClicked ? widget.arrowParams.copyWith(thickness: 3.5) : widget.arrowParams;
 
     final arrowPainter = ArrowPainter(
@@ -1314,17 +1327,14 @@ class ArrowPainter extends CustomPainter {
           final t = m.getTangentForOffset(m.length - 0.1);
           if (t != null) {
             final v = t.vector;
-            headDirection = v.dx.abs() > v.dy.abs()
-                ? (v.dx > 0 ? 'Right' : 'Left')
-                : (v.dy > 0 ? 'Bottom' : 'Top');
+            headDirection = v.dx.abs() > v.dy.abs() ? (v.dx > 0 ? 'Right' : 'Left') : (v.dy > 0 ? 'Bottom' : 'Top');
           }
         }
       }
     } else {
       shortened = path;
     }
-    final Offset headTip =
-        to; // tip remains at destination; path is shortened instead
+    final Offset headTip = to; // tip remains at destination; path is shortened instead
 
     // Draw the arrowhead pointing along the final segment
     if (headDirection == 'Left') {
@@ -1510,9 +1520,7 @@ class ArrowPainter extends CustomPainter {
     } else if (params.endArrowPosition.y < 0) {
       dy = -distance;
     }
-    final p3 = params.endArrowPosition == Alignment.center
-        ? Offset(to.dx, to.dy)
-        : Offset(to.dx + dx, to.dy + dy);
+    final p3 = params.endArrowPosition == Alignment.center ? Offset(to.dx, to.dy) : Offset(to.dx + dx, to.dy + dy);
     final p2 = Offset(
       p1.dx + (p3.dx - p1.dx) / 2,
       p1.dy + (p3.dy - p1.dy) / 2,
@@ -1574,14 +1582,10 @@ class ArrowPainter extends CustomPainter {
 
       // Create a rectangle around the line segment
       final rect = Path()
-        ..moveTo(start.dx + perpendicular.dx * halfWidth,
-            start.dy + perpendicular.dy * halfWidth)
-        ..lineTo(start.dx - perpendicular.dx * halfWidth,
-            start.dy - perpendicular.dy * halfWidth)
-        ..lineTo(end.dx - perpendicular.dx * halfWidth,
-            end.dy - perpendicular.dy * halfWidth)
-        ..lineTo(end.dx + perpendicular.dx * halfWidth,
-            end.dy + perpendicular.dy * halfWidth)
+        ..moveTo(start.dx + perpendicular.dx * halfWidth, start.dy + perpendicular.dy * halfWidth)
+        ..lineTo(start.dx - perpendicular.dx * halfWidth, start.dy - perpendicular.dy * halfWidth)
+        ..lineTo(end.dx - perpendicular.dx * halfWidth, end.dy - perpendicular.dy * halfWidth)
+        ..lineTo(end.dx + perpendicular.dx * halfWidth, end.dy + perpendicular.dy * halfWidth)
         ..close();
 
       if (rect.contains(position)) {
@@ -1684,9 +1688,7 @@ class ArrowPainter extends CustomPainter {
     } else if (params.endArrowPosition.y < 0) {
       dy = -distance;
     }
-    final p3 = params.endArrowPosition == Alignment.center
-        ? Offset(to.dx, to.dy)
-        : Offset(to.dx + dx, to.dy + dy);
+    final p3 = params.endArrowPosition == Alignment.center ? Offset(to.dx, to.dy) : Offset(to.dx + dx, to.dy + dy);
     final p2 = Offset(
       p1.dx + (p3.dx - p1.dx) / 2,
       p1.dy + (p3.dy - p1.dy) / 2,
@@ -1700,8 +1702,7 @@ class ArrowPainter extends CustomPainter {
     return Offset(x, y);
   }
 
-  bool _isInsideBox(Offset position, FlowElement element,
-      {double margin = 10.0}) {
+  bool _isInsideBox(Offset position, FlowElement element, {double margin = 10.0}) {
     final rect = Rect.fromLTWH(
       element.position.dx,
       element.position.dy,

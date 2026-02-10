@@ -256,10 +256,11 @@ class _FlowChartState extends State<FlowChart> {
               ),
             ),
           ),
-          // Draw elements
+          // Draw elements - use stable ValueKey(element.id) to prevent disposal on rebuild
+          // UniqueKey caused ImageWidget to be recreated on every pan/zoom, triggering image reload & flicker
           for (int i = 0; i < widget.dashboard.elements.length; i++)
             ElementWidget(
-              key: UniqueKey(),
+              key: ValueKey(widget.dashboard.elements.elementAt(i).id),
               dashboard: widget.dashboard,
               element: widget.dashboard.elements.elementAt(i),
               onElementPressed: widget.onElementPressed == null
@@ -327,7 +328,7 @@ class _FlowChartState extends State<FlowChart> {
           for (int i = 0; i < widget.dashboard.elements.length; i++)
             for (int n = 0; n < widget.dashboard.elements[i].next.length; n++)
               DrawArrow(
-                key: UniqueKey(),
+                key: ValueKey('arrow_${widget.dashboard.elements[i].id}_${widget.dashboard.elements[i].next[n].destElementId}_$n'),
                 srcElement: widget.dashboard.elements[i],
                 destElement: widget.dashboard.elements[widget.dashboard.findElementIndexById(
                   widget.dashboard.elements[i].next[n].destElementId,
@@ -341,7 +342,7 @@ class _FlowChartState extends State<FlowChart> {
               if (widget.dashboard.elements[i].next[n].arrowParams.style == ArrowStyle.segmented)
                 for (int j = 0; j < widget.dashboard.elements[i].next[n].pivots.length; j++)
                   SegmentHandler(
-                    key: UniqueKey(),
+                    key: ValueKey('segment_${widget.dashboard.elements[i].id}_${widget.dashboard.elements[i].next[n].destElementId}_${n}_$j'),
                     pivot: widget.dashboard.elements[i].next[n].pivots[j],
                     dashboard: widget.dashboard,
                     onPivotPressed: widget.onPivotPressed,
