@@ -1304,53 +1304,19 @@ class ArrowPainter extends CustomPainter {
       ..color = params.color
       ..style = PaintingStyle.stroke;
 
-    if (params.style == ArrowStyle.curve) {
-      drawCurve(canvas, paint);
-    } else if (params.style == ArrowStyle.segmented) {
+    if (params.style == ArrowStyle.segmented) {
       drawLine();
     } else if (params.style == ArrowStyle.rectangular) {
       drawRectangularLine(canvas, paint);
-    }
-
-    // Use PathMetrics to determine final direction and draw shortened path
-    final metrics = path.computeMetrics().toList();
-    String headDirection = direction;
-    Path shortened = Path();
-    if (metrics.isNotEmpty) {
-      for (int i = 0; i < metrics.length; i++) {
-        final m = metrics[i];
-        final bool isLast = i == metrics.length - 1;
-        final double trim = isLast ? (params.headRadius * 1.2) : 0.0;
-        final double endLen = (m.length - trim).clamp(0.0, m.length);
-        shortened.addPath(m.extractPath(0, endLen), Offset.zero);
-        if (isLast) {
-          final t = m.getTangentForOffset(m.length - 0.1);
-          if (t != null) {
-            final v = t.vector;
-            headDirection = v.dx.abs() > v.dy.abs() ? (v.dx > 0 ? 'Right' : 'Left') : (v.dy > 0 ? 'Bottom' : 'Top');
-          }
-        }
-      }
     } else {
-      shortened = path;
-    }
-    final Offset headTip = to; // tip remains at destination; path is shortened instead
-
-    // Draw the arrowhead pointing along the final segment
-    if (headDirection == 'Left') {
-      drawLeftArrowHead(canvas, paint, headTip);
-    } else if (headDirection == 'Right') {
-      drawRightArrowHead(canvas, paint, headTip);
-    } else if (headDirection == 'Bottom') {
-      drawBottomArrowHead(canvas, paint, headTip);
-    } else if (headDirection == 'Top') {
-      drawTopArrowHead(canvas, paint, headTip);
-    } else {
-      drawCircleAtEnd(canvas, paint, headTip);
+      // Default to curve for new connections (handles null/default)
+      drawCurve(canvas, paint);
     }
 
+    // Do not draw any arrowheads for Family Tree connections
+    // Simply draw the final computed path.
     paint.style = PaintingStyle.stroke;
-    canvas.drawPath(shortened, paint);
+    canvas.drawPath(path, paint);
   }
 
   /// Draw a bottom-facing arrowhead
@@ -1449,7 +1415,7 @@ class ArrowPainter extends CustomPainter {
     }
   }
 
-  /// Draw a rectangular line
+  /// Draw a rectangular line with rounded corners
   void drawRectangularLine(Canvas canvas, Paint paint) {
     var pivot1 = Offset(from.dx, from.dy);
     // First offset away from the source based on start alignment (vertical tail)
@@ -1473,11 +1439,39 @@ class ArrowPainter extends CustomPainter {
       pivot2 = Offset(to.dx, pivot1.dy);
     }
 
-    path
-      ..moveTo(from.dx, from.dy)
-      ..lineTo(pivot1.dx, pivot1.dy)
-      ..lineTo(pivot2.dx, pivot2.dy)
-      ..lineTo(to.dx, to.dy);
+    const double radius = 16.0;
+
+    void addRoundedCorner(Offset p1, Offset p2, Offset p3) {
+      final dx1 = p1.dx - p2.dx;
+      final dy1 = p1.dy - p2.dy;
+      final len1 = math.sqrt(dx1 * dx1 + dy1 * dy1);
+
+      final dx2 = p3.dx - p2.dx;
+      final dy2 = p3.dy - p2.dy;
+      final len2 = math.sqrt(dx2 * dx2 + dy2 * dy2);
+
+      if (len1 < 1.0 || len2 < 1.0) {
+        path.lineTo(p2.dx, p2.dy);
+        return;
+      }
+
+      final r1 = math.min(radius, len1 / 2);
+      final r2 = math.min(radius, len2 / 2);
+
+      final startX = p2.dx + (dx1 / len1) * r1;
+      final startY = p2.dy + (dy1 / len1) * r1;
+
+      final endX = p2.dx + (dx2 / len2) * r2;
+      final endY = p2.dy + (dy2 / len2) * r2;
+
+      path.lineTo(startX, startY);
+      path.quadraticBezierTo(p2.dx, p2.dy, endX, endY);
+    }
+
+    path.moveTo(from.dx, from.dy);
+    addRoundedCorner(from, pivot1, pivot2);
+    addRoundedCorner(pivot1, pivot2, to);
+    path.lineTo(to.dx, to.dy);
 
     lines.addAll([
       [from, pivot2],
@@ -1577,8 +1571,6 @@ class ArrowPainter extends CustomPainter {
       final perpendicular = Offset(-unitDirection.dy, unitDirection.dx);
       const halfWidth = 2.5;
 //      final halfWidth = 3.5;
-
-      print('halfWidth Line: $halfWidth');
 
       // Create a rectangle around the line segment
       final rect = Path()

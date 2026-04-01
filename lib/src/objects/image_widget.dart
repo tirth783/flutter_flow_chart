@@ -201,7 +201,8 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
         (stableProvider as AssetImage).assetName.contains(
               'ic_profile_tree',
             );
-    final noSerializedData = (widget.element.serializedData == null) || (widget.element.serializedData is String && (widget.element.serializedData as String).isEmpty);
+    final noSerializedData = (widget.element.serializedData == null) ||
+        (widget.element.serializedData is String && (widget.element.serializedData as String).isEmpty);
 
     _isDefaultIcon = isDefaultAsset || noSerializedData;
     return _isDefaultIcon as bool;
@@ -273,102 +274,123 @@ class _ImageWidgetState extends State<ImageWidget> with AutomaticKeepAliveClient
       width: w,
       height: h,
       child: Stack(
+        alignment: Alignment.center, // Guarantee overall centering
         children: [
           // Background + border
-          Container(
-            decoration: BoxDecoration(
-              color: widget.element.backgroundColor,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: widget.element.borderColor,
-                width: widget.element.borderThickness,
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                color: widget.element.backgroundColor,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: widget.element.borderColor,
+                  width: widget.element.borderThickness,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ],
               ),
             ),
           ),
 
           // Image + text
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Circular image
-              Expanded(
-                flex: 3,
-                child: Center(
-                  child: RepaintBoundary(
-                    child: _shouldShowDefaultIcon()
-                        ? _buildDefaultIcon(diameter)
-                        : ClipOval(
-                            key: ValueKey('${widget.element.id}_image_${widget._imageKey}'),
-                            child: (() {
-                              // Use cached Image widget if diameter and image key haven't changed
-                              if (_cachedImageWidget != null && _cachedImageDiameter == diameter && _cachedImageKey == widget._imageKey) {
-                                return _cachedImageWidget!;
-                              }
-
-                              if (_resizedProvider == null || (_lastDiameter != null && (diameter - _lastDiameter!).abs() > 8)) {
-                                _prepareResizedProvider(diameter);
-                              }
-
-                              final imageWidget = Image(
-                                key: ValueKey('${widget.element.id}_img_${widget._imageKey}'),
-                                image: _resizedProvider!,
-                                width: diameter,
-                                height: diameter,
-                                fit: BoxFit.cover,
-                                gaplessPlayback: true,
-                                filterQuality: FilterQuality.high,
-                                frameBuilder: (
-                                  context,
-                                  child,
-                                  frame,
-                                  wasSynchronouslyLoaded,
-                                ) {
-                                  // Return child immediately to avoid fade and minimize flicker
-                                  return child;
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return _buildDefaultIcon(diameter);
-                                },
-                              );
-
-                              // Cache the Image widget
-                              _cachedImageWidget = imageWidget;
-                              _cachedImageDiameter = diameter;
-
-                              return imageWidget;
-                            })(),
-                          ),
-                  ),
-                ),
-              ),
-              // Text beneath
-              Expanded(
-                flex: 1,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (widget.element.text.isNotEmpty)
-                        ElementTextWidget(
-                          text: widget.element.text,
-                          textColor: widget.element.textColor,
-                          textSize: widget.element.textSize,
-                          fontFamily: widget.element.fontFamily,
-                          isBold: widget.element.textIsBold,
+          Positioned.fill(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center, // Guarantee vertical centering
+                  crossAxisAlignment: CrossAxisAlignment.center, // Guarantee horizontal centering
+                  children: [
+                    // Circular image with colored ring
+                    Container(
+                      padding: const EdgeInsets.all(3.0), // Gap between image and ring
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: widget.element.borderColor,
+                          width: widget.element.borderThickness > 1 ? 2.5 : 1.5,
                         ),
-                      if (widget.element.subText.isNotEmpty)
-                        ElementTextWidget(
-                          text: widget.element.subText,
-                          textColor: widget.element.subTextColor,
-                          textSize: widget.element.subTextSize,
-                          fontFamily: widget.element.fontFamily,
-                          isBold: widget.element.textIsBold,
+                      ),
+                      child: RepaintBoundary(
+                        child: SizedBox(
+                          width: diameter * 0.9,
+                          height: diameter * 0.9,
+                          child: _shouldShowDefaultIcon()
+                              ? _buildDefaultIcon(diameter * 0.9)
+                              : ClipOval(
+                                  key: ValueKey('${widget.element.id}_image_${widget._imageKey}'),
+                                  child: (() {
+                                    // Use cached Image widget if diameter and image key haven't changed
+                                    if (_cachedImageWidget != null &&
+                                        _cachedImageDiameter == diameter &&
+                                        _cachedImageKey == widget._imageKey) {
+                                      return _cachedImageWidget!;
+                                    }
+
+                                    if (_resizedProvider == null ||
+                                        (_lastDiameter != null && (diameter - _lastDiameter!).abs() > 8)) {
+                                      _prepareResizedProvider(diameter);
+                                    }
+
+                                    final imageWidget = Image(
+                                      key: ValueKey('${widget.element.id}_img_${widget._imageKey}'),
+                                      image: _resizedProvider!,
+                                      width: diameter * 0.9,
+                                      height: diameter * 0.9,
+                                      fit: BoxFit.cover, // Ensure it fills the circle cleanly
+                                      alignment: Alignment.center,
+                                      gaplessPlayback: true,
+                                      filterQuality: FilterQuality.high,
+                                      frameBuilder: (context, child, frame, wasSyncLoaded) {
+                                        return child;
+                                      },
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return _buildDefaultIcon(diameter * 0.9);
+                                      },
+                                    );
+
+                                    _cachedImageWidget = imageWidget;
+                                    _cachedImageDiameter = diameter;
+
+                                    return imageWidget;
+                                  })(),
+                                ),
                         ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12), // Give uniform spacing beneath the avatar
+
+                    // Text beneath
+                    if (widget.element.text.isNotEmpty)
+                      ElementTextWidget(
+                        text: widget.element.text,
+                        textColor: widget.element.textColor,
+                        textSize: widget.element.textSize,
+                        fontFamily: widget.element.fontFamily,
+                        isBold: true,
+                      ),
+                    if (widget.element.subText.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      ElementTextWidget(
+                        text: widget.element.subText,
+                        textColor: widget.element.subTextColor,
+                        textSize: widget.element.subTextSize,
+                        fontFamily: widget.element.fontFamily,
+                        isBold: false,
+                      ),
                     ],
-                  ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ],
       ),

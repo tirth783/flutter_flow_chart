@@ -178,33 +178,42 @@ class _GridBackgroundPainter extends CustomPainter {
       paint,
     );
 
-    // grid (skip if transparent or zero thickness)
-    if (params.gridColor.alpha == 0 || params.gridThickness == 0) {
-      return;
-    }
-    paint
-      ..color = params.gridColor
-      ..style = PaintingStyle.stroke;
+    // Forcefully show grid for all trees (ignore saved backend settings if transparent)
+    final Color activeGridColor = params.gridColor.alpha == 0 
+        ? const Color(0xFFE9EDF5) // Default light grey for diamonds
+        : params.gridColor;
 
     // Calculate the starting points for x and y
-    final startX = dx % (params.gridSquare * params.secondarySquareStep);
-    final startY = dy % (params.gridSquare * params.secondarySquareStep);
-
-    // Calculate the number of lines to draw outside the visible area
-    const extraLines = 1;
-
-    // Draw vertical lines
-    for (var x = startX - extraLines * params.gridSquare; x < size.width + extraLines * params.gridSquare; x += params.gridSquare) {
-      paint.strokeWidth =
-          ((x - startX) / params.gridSquare).round() % params.secondarySquareStep == 0 ? params.gridThickness * 2.0 : params.gridThickness;
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    double step = params.gridSquare * params.secondarySquareStep / 2;
+    if (step <= 0) {
+      step = 22.0 * 2; // Fallback step if zero from legacy data
     }
 
-    // Draw horizontal lines
-    for (var y = startY - extraLines * params.gridSquare; y < size.height + extraLines * params.gridSquare; y += params.gridSquare) {
-      paint.strokeWidth =
-          ((y - startY) / params.gridSquare).round() % params.secondarySquareStep == 0 ? params.gridThickness * 2.0 : params.gridThickness;
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    final startX = dx % step;
+    final startY = dy % step;
+
+    // Calculate the number of points to draw outside the visible area
+    const extraLines = 1;
+
+    // Diamond size
+    final diamondRadius = 3.0 * params.scale;
+
+    paint
+      ..color = activeGridColor
+      ..style = PaintingStyle.fill;
+
+    // Draw diamond grid
+    for (var x = startX - extraLines * step; x < size.width + extraLines * step; x += step) {
+      for (var y = startY - extraLines * step; y < size.height + extraLines * step; y += step) {
+        final path = Path()
+          ..moveTo(x, y - diamondRadius)
+          ..lineTo(x + diamondRadius, y)
+          ..lineTo(x, y + diamondRadius)
+          ..lineTo(x - diamondRadius, y)
+          ..close();
+        
+        canvas.drawPath(path, paint);
+      }
     }
   }
 
