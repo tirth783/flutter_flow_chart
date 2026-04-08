@@ -298,7 +298,10 @@ class _FlowChartState extends State<FlowChart> {
                         position,
                         widget.dashboard.elements.elementAt(i),
                       ),
-              onHandlerPressed: widget.onHandlerPressed == null ? null : (context, position, handler, element) => widget.onHandlerPressed!(context, position, handler, element),
+              onHandlerPressed: widget.onHandlerPressed == null
+                  ? null
+                  : (context, position, handler, element) =>
+                      widget.onHandlerPressed!(context, position, handler, element),
               onHandlerSecondaryTapped: widget.onHandlerSecondaryTapped == null
                   ? null
                   : (context, position, handler, element) => widget.onHandlerSecondaryTapped!(
@@ -327,22 +330,30 @@ class _FlowChartState extends State<FlowChart> {
           // Draw arrows
           for (int i = 0; i < widget.dashboard.elements.length; i++)
             for (int n = 0; n < widget.dashboard.elements[i].next.length; n++)
-              DrawArrow(
-                key: ValueKey('arrow_${widget.dashboard.elements[i].id}_${widget.dashboard.elements[i].next[n].destElementId}_$n'),
-                srcElement: widget.dashboard.elements[i],
-                destElement: widget.dashboard.elements[widget.dashboard.findElementIndexById(
-                  widget.dashboard.elements[i].next[n].destElementId,
-                )],
-                arrowParams: widget.dashboard.elements[i].next[n].arrowParams,
-                pivots: widget.dashboard.elements[i].next[n].pivots,
-              ),
+              () {
+                final spouseId = widget.dashboard.elements[i].next[n].arrowParams.spouseElementId;
+                final spouseElement = spouseId != null ? widget.dashboard.findElementById(spouseId) : null;
+                return DrawArrow(
+                  key: ValueKey(
+                      'arrow_${widget.dashboard.elements[i].id}_${widget.dashboard.elements[i].next[n].destElementId}_$n'),
+                  srcElement: widget.dashboard.elements[i],
+                  destElement: widget.dashboard.findElementById(
+                    widget.dashboard.elements[i].next[n].destElementId,
+                  )!,
+                  spouseElement: spouseElement,
+                  pivots: widget.dashboard.elements[i].next[n].pivots,
+                  arrowParams: widget.dashboard.elements[i].next[n].arrowParams,
+                  dashboard: widget.dashboard,
+                );
+              }(),
           // drawing segment handlers
           for (int i = 0; i < widget.dashboard.elements.length; i++)
             for (int n = 0; n < widget.dashboard.elements[i].next.length; n++)
               if (widget.dashboard.elements[i].next[n].arrowParams.style == ArrowStyle.segmented)
                 for (int j = 0; j < widget.dashboard.elements[i].next[n].pivots.length; j++)
                   SegmentHandler(
-                    key: ValueKey('segment_${widget.dashboard.elements[i].id}_${widget.dashboard.elements[i].next[n].destElementId}_${n}_$j'),
+                    key: ValueKey(
+                        'segment_${widget.dashboard.elements[i].id}_${widget.dashboard.elements[i].next[n].destElementId}_${n}_$j'),
                     pivot: widget.dashboard.elements[i].next[n].pivots[j],
                     dashboard: widget.dashboard,
                     onPivotPressed: widget.onPivotPressed,
